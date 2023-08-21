@@ -70,9 +70,9 @@ func Start(port string) {
 			default:
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 			}
-
 		}
 
+		ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 		return
 	})
 
