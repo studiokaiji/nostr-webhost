@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  relay:
+    image: "scsibug/nostr-rs-relay"
+    ports:
+      - "7001:8080"
+    volumes:
+      - ./nostr-rs-relay/data:/usr/src/app/db
+      - ./nostr-rs-relay/config.toml:/usr/src/app/config.toml
+    user: root
+    container_name: nostr-webhost-relay
