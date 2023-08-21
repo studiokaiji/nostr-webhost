@@ -22,7 +22,7 @@ jobs:
       # Go をセットアップ
       - uses: actions/setup-go@v3
         with:
-          go-version-file: go.mod
+          go-version-file: cli/go.mod
           cache: true
 
       # リリース
