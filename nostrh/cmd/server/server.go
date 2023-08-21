@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/studiokaiji/nostr-webhost/cli/cmd/consts"
-	"github.com/studiokaiji/nostr-webhost/cli/cmd/relays"
+	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/consts"
+	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/relays"
 )
 
 func Start(port string) {
