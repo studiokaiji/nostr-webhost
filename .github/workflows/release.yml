@@ -5,12 +5,13 @@ on:
     tags:
       - "v*"
 
+defaults:
+  run:
+    working-directory: cli
+
 jobs:
   release:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: cli
     permissions:
       contents: write
     steps:
