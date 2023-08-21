@@ -22,8 +22,7 @@ jobs:
       # Go をセットアップ
       - uses: actions/setup-go@v3
         with:
-          go-version-file: cli/go.mod
-          cache: true
+          go-version: "1.21.0"
 
       # リリース
       - uses: goreleaser/goreleaser-action@v4
