@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: cli
+    working-directory: ./cli
 
 jobs:
   release:
