@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/studiokaiji/nostr-webhost/cmd/consts"
-	"github.com/studiokaiji/nostr-webhost/cmd/relays"
+	"github.com/studiokaiji/nostr-webhost/cli/cmd/consts"
+	"github.com/studiokaiji/nostr-webhost/cli/cmd/relays"
 )
 
 func Start(port string) {
@@ -70,9 +70,9 @@ func Start(port string) {
 			default:
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 			}
-
 		}
 
+		ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 		return
 	})
 

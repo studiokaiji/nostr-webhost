@@ -8,9 +8,7 @@ Nostr Webhost is a command-line tool designed for hosting Single Page Applicatio
 
 To get started with Nostr Webhost, follow these steps:
 
-1. Install the tool using the following command:
-
-2. Ensure you have Node.js and npm installed on your machine.
+1. `go install github.com/studiokaiji/nostr-webhost@latest`
 
 ### Commands
 

@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/studiokaiji/nostr-webhost/cmd/deploy"
-	"github.com/studiokaiji/nostr-webhost/cmd/keystore"
-	"github.com/studiokaiji/nostr-webhost/cmd/relays"
-	"github.com/studiokaiji/nostr-webhost/cmd/server"
+	"github.com/studiokaiji/nostr-webhost/cli/cmd/deploy"
+	"github.com/studiokaiji/nostr-webhost/cli/cmd/keystore"
+	"github.com/studiokaiji/nostr-webhost/cli/cmd/relays"
+	"github.com/studiokaiji/nostr-webhost/cli/cmd/server"
 	"github.com/urfave/cli/v2"
 )
 
