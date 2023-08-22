@@ -1,6 +1,6 @@
 # Nostr Webhost
 
-Example webpage: https://nostrwebhostapp.studiokaiji.com/e/53af1fa215cd7218d12b5f8b6ba2f837e985fd1edba6288fb41aac66ad3fb651[https://nostrwebhostapp.studiokaiji.com/e/53af1fa215cd7218d12b5f8b6ba2f837e985fd1edba6288fb41aac66ad3fb651]
+Example webpage: https://nostrwebhostapp.studiokaiji.com/e/53af1fa215cd7218d12b5f8b6ba2f837e985fd1edba6288fb41aac66ad3fb651
 
 ## Overview
 
