@@ -19,8 +19,8 @@ import (
 )
 
 func pathToKind(path string) (int, error) {
-	splittedPath := strings.Split(path, ".")
-	ex := splittedPath[len(splittedPath)-1]
+	separatedPath := strings.Split(path, ".")
+	ex := separatedPath[len(separatedPath)-1]
 	switch ex {
 	case "html":
 		return consts.KindWebhostHTML, nil
