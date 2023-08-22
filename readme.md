@@ -1,5 +1,7 @@
 # Nostr Webhost
 
+Example webpage: https://nostrwebhostapp.studiokaiji.com/e/53af1fa215cd7218d12b5f8b6ba2f837e985fd1edba6288fb41aac66ad3fb651[https://nostrwebhostapp.studiokaiji.com/e/53af1fa215cd7218d12b5f8b6ba2f837e985fd1edba6288fb41aac66ad3fb651]
+
 ## Overview
 
 Nostr Webhost is a command-line tool designed for hosting Single Page Applications (SPAs) using the Nostr protocol and its distributed network of relay servers. This tool provides a seamless way to deploy and access your SPA on the Nostr network.
