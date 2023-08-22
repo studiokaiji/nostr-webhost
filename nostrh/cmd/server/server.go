@@ -43,7 +43,7 @@ func Start(port string) {
 			case consts.KindWebhostPicture:
 				{
 					eTag := ev.Tags.GetFirst([]string{"e"})
-					mTag := ev.Tags.GetFirst([]string{"e"})
+					mTag := ev.Tags.GetFirst([]string{"m"})
 
 					if eTag == nil || mTag == nil {
 						ctx.String(http.StatusBadRequest, http.StatusText((http.StatusBadRequest)))
