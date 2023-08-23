@@ -1,6 +1,6 @@
-# Nostr Webhost
+# Nostr Webhost (hostr)
 
-Example webpage: https://nostrwebhostapp.studiokaiji.com/e/53af1fa215cd7218d12b5f8b6ba2f837e985fd1edba6288fb41aac66ad3fb651
+Example webpage: https://h.hostr.cc/e/53af1fa215cd7218d12b5f8b6ba2f837e985fd1edba6288fb41aac66ad3fb651
 
 ## Overview
 
@@ -34,7 +34,7 @@ COMMANDS:
 If you set private key: `nostrh set-private "nsec or hex private key"`
 Or if you want to generate private key: `nostrh generate-key`
 3. Add relay
-`nostrh add-relay wss://nostrwebhost.studiokaiji.com`
+`nostrh add-relay wss://r.hostr.cc`
 4. Deploy
 `nostrh deploy /BUILT/SPA/DIR/PATH`
 The event id of index.html will be output after deploy. Please make a copy of it.
