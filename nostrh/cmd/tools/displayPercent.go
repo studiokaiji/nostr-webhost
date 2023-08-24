@@ -21,7 +21,7 @@ func DisplayProgressBar(current, total *int) {
 		width = 100
 	}
 
-	for true {
+	for {
 		progress := int(float64(*current) / float64(*total) * float64(width))
 
 		// バーの描画

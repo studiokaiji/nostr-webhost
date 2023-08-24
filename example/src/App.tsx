@@ -28,8 +28,8 @@ function App() {
         <div>
           <p>
             Relay URL:{" "}
-            <Link href="wss://nostrwebhost.studiokaiji.com">
-              wss://nostrwebhost.studiokaiji.com
+            <Link href="wss://hostr.cc">
+              wss://hostr.cc
             </Link>
           </p>
           <p>HTML ID: {htmlId}</p>
