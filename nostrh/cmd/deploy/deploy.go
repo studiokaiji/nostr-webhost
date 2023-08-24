@@ -80,6 +80,7 @@ func publishEventsFromQueue() (string, error) {
 	for _, ev := range nostrEventsQueue {
 		wg.Add(1)
 		go func(event *nostr.Event) {
+			defer wg.Done() // ゴルーチンの終了を通知
 			for _, relay := range relays {
 				_, err := relay.Publish(ctx, *event)
 				if err != nil {
@@ -90,7 +91,6 @@ func publishEventsFromQueue() (string, error) {
 			mutex.Lock()         // ロックして排他制御
 			uploadedFilesCount++ // カウントアップ
 			mutex.Unlock()       // ロック解除
-			wg.Done()            // ゴルーチンの終了を通知
 		}(ev)
 	}
 
