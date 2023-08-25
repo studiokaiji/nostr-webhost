@@ -36,11 +36,11 @@ func Start(port string) {
 		if ev != nil {
 			switch ev.Kind {
 			case consts.KindWebhostHTML:
-				ctx.Data(http.StatusOK, "text/html", []byte(ev.Content))
+				ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(ev.Content))
 			case consts.KindWebhostCSS:
-				ctx.Data(http.StatusOK, "text/css", []byte(ev.Content))
+				ctx.Data(http.StatusOK, "text/css; charset=utf-8", []byte(ev.Content))
 			case consts.KindWebhostJS:
-				ctx.Data(http.StatusOK, "text/javascript", []byte(ev.Content))
+				ctx.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(ev.Content))
 			case consts.KindWebhostPicture:
 				{
 					eTag := ev.Tags.GetFirst([]string{"e"})
@@ -111,11 +111,11 @@ func Start(port string) {
 		if ev != nil {
 			switch ev.Kind {
 			case consts.KindWebhostReplaceableHTML:
-				ctx.Data(http.StatusOK, "text/html", []byte(ev.Content))
+				ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(ev.Content))
 			case consts.KindWebhostReplaceableCSS:
-				ctx.Data(http.StatusOK, "text/css", []byte(ev.Content))
+				ctx.Data(http.StatusOK, "text/css; charset=utf-8", []byte(ev.Content))
 			case consts.KindWebhostReplaceableJS:
-				ctx.Data(http.StatusOK, "text/javascript", []byte(ev.Content))
+				ctx.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(ev.Content))
 			default:
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 			}
