@@ -11,7 +11,7 @@ func DisplayProgressBar(current, total *int) {
 	// ターミナルのサイズを取得
 	terminalWidth, _, err := term.GetSize(0)
 	if err != nil {
-		panic(err)
+		terminalWidth = 80
 	}
 
 	width := terminalWidth - 12
