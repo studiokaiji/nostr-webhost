@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip19"
+	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/paths"
 )
 
 const PATH = ".nostr_account_secret"
@@ -20,8 +22,19 @@ func SetSecret(key string) error {
 		}
 		key = v.(string)
 	}
+
+	dir, err := paths.GetSettingsDirectory()
+	if err != nil {
+		return err
+	}
+
+	filePath := filepath.Join(dir, PATH)
+	if err != nil {
+		return err
+	}
+
 	// キーをファイルに書き込み
-	return os.WriteFile(PATH, []byte(key), 0644)
+	return os.WriteFile(filePath, []byte(key), 0644)
 }
 
 func ShowPublic() (string, string, error) {

@@ -154,7 +154,6 @@ func main() {
 
 			fmt.Println(buf.String())
 		}
-
 	}
 
 	// Start app
