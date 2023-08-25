@@ -1,21 +1,20 @@
 package main
 
 import (
-	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/deploy"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/keystore"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/paths"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/relays"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/server"
 	"github.com/urfave/cli/v2"
 )
 
-const cuteOstrichFileName = "cute-ostrich.txt"
+//go:embed cute-ostrich.txt
+var cuteOstrich string
 
 func main() {
 	var (
@@ -140,30 +139,7 @@ func main() {
 
 	if len(os.Args) < 2 || os.Args[1] == "help" || os.Args[1] == "h" {
 		// Display ostrich
-		projectDir, err := paths.GetProjectRootDirectory()
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		filePath := filepath.Join(projectDir, cuteOstrichFileName)
-		file, err := os.Open(filePath)
-		if err != nil {
-			fmt.Println(err)
-		}
-		defer file.Close()
-
-		buf := new(bytes.Buffer)
-		for {
-			n, err := buf.ReadFrom(file)
-			if n == 0 {
-				break
-			}
-			if err != nil {
-				break
-			}
-
-			fmt.Println(buf.String())
-		}
+		fmt.Println(cuteOstrich)
 	}
 
 	// Start app
