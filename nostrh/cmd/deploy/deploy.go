@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -18,19 +19,40 @@ import (
 	"golang.org/x/net/html"
 )
 
-func pathToKind(path string) (int, error) {
+func pathToKind(path string, replaceable bool) (int, error) {
+	// パスを分割
 	separatedPath := strings.Split(path, ".")
+	// 拡張子を取得
 	ex := separatedPath[len(separatedPath)-1]
+	// replaceable(NIP-33)の場合はReplaceableなkindを返す
 	switch ex {
 	case "html":
-		return consts.KindWebhostHTML, nil
+		if replaceable {
+			return consts.KindWebhostHTML, nil
+		} else {
+			return consts.KindWebhostReplaceableHTML, nil
+		}
 	case "css":
-		return consts.KindWebhostCSS, nil
+		if replaceable {
+			return consts.KindWebhostReplaceableCSS, nil
+		} else {
+			return consts.KindWebhostCSS, nil
+		}
 	case "js":
-		return consts.KindWebhostJS, nil
+		if replaceable {
+			return consts.KindWebhostReplaceableJS, nil
+		} else {
+			return consts.KindWebhostJS, nil
+		}
 	default:
-		return 0, nil
+		return 0, fmt.Errorf("Invalid path")
 	}
+}
+
+// Replaceableにする場合のidentifier(dタグ)を取得
+func getReplaceableIdentifier(indexHtmlIdentifier, filePath string) string {
+	encodedFilePath := strings.ReplaceAll(filePath, "/", "_")
+	return indexHtmlIdentifier + "-" + encodedFilePath
 }
 
 var nostrEventsQueue []*nostr.Event
@@ -117,7 +139,7 @@ func isValidFileType(str string) bool {
 	return strings.HasSuffix(str, ".html") || strings.HasSuffix(str, ".css") || strings.HasSuffix(str, ".js")
 }
 
-func Deploy(basePath string) (string, error) {
+func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, error) {
 	// 引数からデプロイしたいサイトのパスを受け取る。
 	filePath := filepath.Join(basePath, "index.html")
 
@@ -147,10 +169,21 @@ func Deploy(basePath string) (string, error) {
 		return "", err
 	}
 
-	// index.htmlファイル内に記述されている他Assetのパスから実際のデータを取得。
-	// 取得してきたデータをeventにしてIDを取得。
+	// htmlIdentifierの存在チェック
+	if len(htmlIdentifier) < 1 {
+		// htmlIdentifierが指定されていない場合はユーザー入力を受け取る
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("⌨️ Please type identifier: ")
+
+		htmlIdentifier, _ = reader.ReadString('\n')
+		// 改行タグを削除
+		htmlIdentifier = strings.TrimSpace(htmlIdentifier)
+
+		fmt.Printf("Identifier: %s\n", htmlIdentifier)
+	}
+
 	// リンクの解析と変換
-	convertLinks(priKey, pubKey, basePath, doc)
+	convertLinks(priKey, pubKey, basePath, replaceable, htmlIdentifier, doc)
 
 	// 更新されたHTML
 	var buf bytes.Buffer
@@ -158,8 +191,20 @@ func Deploy(basePath string) (string, error) {
 
 	strHtml := buf.String()
 
+	// index.htmlのkindを設定
+	indexHtmlKind := consts.KindWebhostHTML
+	if replaceable {
+		indexHtmlKind = consts.KindWebhostReplaceableHTML
+	}
+
+	// Tagsを追加
+	tags := nostr.Tags{}
+	if replaceable {
+		tags = tags.AppendUnique(nostr.Tag{"d", htmlIdentifier})
+	}
+
 	// Eventを生成しキューに追加
-	event, err := getEvent(priKey, pubKey, strHtml, consts.KindWebhostHTML)
+	event, err := getEvent(priKey, pubKey, strHtml, indexHtmlKind, tags)
 	if err != nil {
 		fmt.Println("❌ Failed to get public key:", err)
 		return "", err
@@ -170,15 +215,16 @@ func Deploy(basePath string) (string, error) {
 	return publishEventsFromQueue()
 }
 
-func convertLinks(priKey, pubKey, basePath string, n *html.Node) {
+func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlIdentifier string, n *html.Node) {
 	// <link> と <script> タグを対象とする
 	if n.Type == html.ElementNode && (n.Data == "link" || n.Data == "script") {
 		for i, a := range n.Attr {
 			// href,srcのうち、外部URLでないものかつ. html, .css, .js のみ変換する
 			if (a.Key == "href" || a.Key == "src") && !isExternalURL(a.Val) && isValidFileType(a.Val) {
 				filePath := filepath.Join(basePath, a.Val)
+
 				// kindを取得
-				kind, err := pathToKind(filePath)
+				kind, err := pathToKind(filePath, replaceable)
 				if err != nil {
 					continue
 				}
@@ -190,8 +236,18 @@ func convertLinks(priKey, pubKey, basePath string, n *html.Node) {
 					continue
 				}
 
+				// Tagsを追加
+				tags := nostr.Tags{}
+				// 置き換え可能なイベントの場合
+				if replaceable {
+					fileIdentifier := getReplaceableIdentifier(indexHtmlIdentifier, a.Val)
+					tags = tags.AppendUnique(nostr.Tag{"d", fileIdentifier})
+					// 元のパスをfileIdentifierに置き換える
+					n.Attr[i].Val = fileIdentifier
+				}
+
 				// Eventを生成し、キューに追加
-				event, err := getEvent(priKey, pubKey, string(bytesContent), kind)
+				event, err := getEvent(priKey, pubKey, string(bytesContent), kind, tags)
 				if err != nil {
 					fmt.Println("❌ Failed to get event for", filePath, ":", err)
 					break
@@ -200,24 +256,27 @@ func convertLinks(priKey, pubKey, basePath string, n *html.Node) {
 				addNostrEventQueue(event)
 				fmt.Println("Added", filePath, "event to publish queue")
 
-				// 元のパスをEvent[.]IDに変更
-				n.Attr[i].Val = event.ID
+				if !replaceable {
+					// 元のパスをEvent[.]IDに変更
+					n.Attr[i].Val = event.ID
+				}
 			}
 		}
 	}
 
 	// 子ノードに対して再帰的に処理
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		convertLinks(priKey, pubKey, basePath, c)
+		convertLinks(priKey, pubKey, basePath, replaceable, indexHtmlIdentifier, c)
 	}
 }
 
-func getEvent(priKey, pubKey, content string, kind int) (*nostr.Event, error) {
+func getEvent(priKey, pubKey, content string, kind int, tags nostr.Tags) (*nostr.Event, error) {
 	ev := nostr.Event{
 		PubKey:    pubKey,
 		CreatedAt: nostr.Now(),
 		Kind:      kind,
 		Content:   content,
+		Tags:      tags,
 	}
 
 	err := ev.Sign(priKey)
