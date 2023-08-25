@@ -1,8 +1,10 @@
 package deploy
 
 import (
+	"bufio"
 	"bytes"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"os"
@@ -50,7 +52,8 @@ func pathToKind(path string, replaceable bool) (int, error) {
 
 // Replaceableにする場合のidentifier(dタグ)を取得
 func getReplaceableIdentifier(indexHtmlIdentifier, filePath string) string {
-	return indexHtmlIdentifier + filePath
+	encodedFilePath := base64.StdEncoding.EncodeToString([]byte(filePath))
+	return indexHtmlIdentifier + encodedFilePath
 }
 
 var nostrEventsQueue []*nostr.Event
@@ -168,13 +171,18 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, e
 	}
 
 	// htmlIdentifierの存在チェック
-	if (len(htmlIdentifier) < 1) {
-		// htmlIdentifier
+	if len(htmlIdentifier) < 1 {
+		// htmlIdentifierが指定されていない場合はユーザー入力を受け取る
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("⌨️ Please type identifier: ")
+
+		htmlIdentifier, _ = reader.ReadString('\n')
+		// 改行タグを削除
+		htmlIdentifier = strings.TrimSpace(htmlIdentifier)
+
+		fmt.Printf("Identifier: %s\n", htmlIdentifier)
 	}
 
-
-	// index.htmlファイル内に記述されている他Assetのパスから実際のデータを取得。
-	// 取得してきたデータをeventにしてIDを取得。
 	// リンクの解析と変換
 	convertLinks(priKey, pubKey, basePath, replaceable, htmlIdentifier, doc)
 
@@ -205,6 +213,8 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, e
 	addNostrEventQueue(event)
 	fmt.Println("Added", filePath, "event to publish queue")
 
+	fmt.Println(event)
+
 	return publishEventsFromQueue()
 }
 
@@ -231,9 +241,12 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 
 				// Tagsを追加
 				tags := nostr.Tags{}
+				// 置き換え可能なイベントの場合
 				if replaceable {
-					fileIdentifier := getReplaceableIdentifier(indexHtmlIdentifier, filePath)
+					fileIdentifier := getReplaceableIdentifier(indexHtmlIdentifier, a.Val)
 					tags = tags.AppendUnique(nostr.Tag{"d", fileIdentifier})
+					// 元のパスをfileIdentifierに置き換える
+					n.Attr[i].Val = fileIdentifier
 				}
 
 				// Eventを生成し、キューに追加
@@ -246,8 +259,10 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 				addNostrEventQueue(event)
 				fmt.Println("Added", filePath, "event to publish queue")
 
-				// 元のパスをEvent[.]IDに変更
-				n.Attr[i].Val = event.ID
+				if !replaceable {
+					// 元のパスをEvent[.]IDに変更
+					n.Attr[i].Val = event.ID
+				}
 			}
 		}
 	}
