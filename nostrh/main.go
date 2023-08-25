@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
 
@@ -12,6 +12,9 @@ import (
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/server"
 	"github.com/urfave/cli/v2"
 )
+
+//go:embed cute-ostrich.txt
+var cuteOstrich string
 
 func main() {
 	var (
@@ -136,24 +139,7 @@ func main() {
 
 	if len(os.Args) < 2 || os.Args[1] == "help" || os.Args[1] == "h" {
 		// Display ostrich
-		file, err := os.Open("./cute-ostrich.txt")
-		if err != nil {
-			fmt.Println(err)
-		}
-		defer file.Close()
-
-		buf := new(bytes.Buffer)
-		for {
-			n, err := buf.ReadFrom(file)
-			if n == 0 {
-				break
-			}
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Println(buf.String())
-		}
+		fmt.Println(cuteOstrich)
 	}
 
 	// Start app
