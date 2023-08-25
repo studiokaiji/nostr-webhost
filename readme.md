@@ -2,17 +2,20 @@
 
 Example webpage: https://h.hostr.cc/e/53af1fa215cd7218d12b5f8b6ba2f837e985fd1edba6288fb41aac66ad3fb651
 
-## Overview
+## 🌐 Overview
 
 Nostr Webhost is a command-line tool designed for hosting Single Page Applications (SPAs) using the Nostr protocol and its distributed network of relay servers. This tool provides a seamless way to deploy and access your SPA on the Nostr network.
 
-### Installation
+## ⚠️ Caution
+Domain-based authorization mechanisms such as NIP-7 should not currently be used. This is because the event is identified based on the path, so it will authorize other events as well.
+
+### 📦 Installation
 
 To get started with Nostr Webhost, follow these steps:
 
 1. `go install github.com/studiokaiji/nostr-webhost/nostrh@latest`
 
-### Commands
+### ⌨️ Commands
 
 ```bash
 COMMANDS:
@@ -27,7 +30,7 @@ COMMANDS:
    help, h       Shows a list of commands or help for one command
 ```
 
-### Getting Started
+### 🚀 Getting Started
 
 1. Install Nostr Webhost as mentioned above.
 2. Set or generate private key
@@ -44,10 +47,10 @@ The event id of index.html will be output after deploy. Please make a copy of it
 
 For detailed information on how to use each command, you can use the `help` command followed by the specific command name.
 
-## Feedback and Contributions
+## 👍 Feedback and Contributions
 
 If you encounter any issues or have suggestions for improvement, feel free to contribute to the project on GitHub [link to GitHub repository].
 
-## License
+## 📃 License
 
 This project is licensed under the MIT. See the LICENSE file for more details.
