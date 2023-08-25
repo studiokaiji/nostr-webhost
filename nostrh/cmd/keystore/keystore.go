@@ -57,7 +57,17 @@ func GetPublic() (string, error) {
 }
 
 func GetSecret() (string, error) {
-	secretBytes, err := os.ReadFile(PATH)
+	dir, err := paths.GetSettingsDirectory()
+	if err != nil {
+		return "", err
+	}
+
+	filePath := filepath.Join(dir, PATH)
+	if err != nil {
+		return "", err
+	}
+
+	secretBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", errors.New("Could not read secret")
 	}

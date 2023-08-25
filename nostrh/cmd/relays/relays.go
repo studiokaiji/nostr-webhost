@@ -28,7 +28,14 @@ func AddRelay(relayURL string) error {
 }
 
 func RemoveRelay(targetURL string) error {
-	content, err := os.ReadFile(PATH)
+	dir, err := paths.GetSettingsDirectory()
+	if err != nil {
+		return err
+	}
+
+	filePath := filepath.Join(dir, PATH)
+
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -49,7 +56,14 @@ func RemoveRelay(targetURL string) error {
 }
 
 func GetAllRelays() ([]string, error) {
-	content, err := os.ReadFile(PATH)
+	dir, err := paths.GetSettingsDirectory()
+	if err != nil {
+		return nil, err
+	}
+
+	filePath := filepath.Join(dir, PATH)
+
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
