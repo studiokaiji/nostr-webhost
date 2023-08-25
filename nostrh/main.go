@@ -109,7 +109,7 @@ func main() {
 					key := nostr.GeneratePrivateKey()
 					err := keystore.SetSecret(key)
 					if err == nil {
-						fmt.Print("🗝  Generated key\n🗝  You can check the public key with 'noshost show-public'\n")
+						fmt.Print("🗝  Generated key\n🗝  You can check the public key with 'nostrh show-public'\n")
 					}
 					return err
 				},
@@ -154,7 +154,6 @@ func main() {
 
 			fmt.Println(buf.String())
 		}
-
 	}
 
 	// Start app
