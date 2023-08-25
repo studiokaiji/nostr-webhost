@@ -26,3 +26,15 @@ func GetSettingsDirectory() (string, error) {
 
 	return dirPath, nil
 }
+
+func GetProjectRootDirectory() (string, error) {
+	// 実行中のバイナリの絶対パスを取得
+	exePath, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+
+	// ディレクトリパスを取得
+	dir := filepath.Dir(exePath)
+	return dir, nil
+}

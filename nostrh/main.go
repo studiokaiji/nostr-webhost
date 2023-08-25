@@ -4,14 +4,18 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/deploy"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/keystore"
+	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/paths"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/relays"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/server"
 	"github.com/urfave/cli/v2"
 )
+
+const cuteOstrichFileName = "cute-ostrich.txt"
 
 func main() {
 	var (
@@ -136,7 +140,13 @@ func main() {
 
 	if len(os.Args) < 2 || os.Args[1] == "help" || os.Args[1] == "h" {
 		// Display ostrich
-		file, err := os.Open("./cute-ostrich.txt")
+		projectDir, err := paths.GetProjectRootDirectory()
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		filePath := filepath.Join(projectDir, cuteOstrichFileName)
+		file, err := os.Open(filePath)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -149,7 +159,7 @@ func main() {
 				break
 			}
 			if err != nil {
-				panic(err)
+				break
 			}
 
 			fmt.Println(buf.String())
