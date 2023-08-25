@@ -2,13 +2,22 @@ package relays
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
+
+	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/paths"
 )
 
 const PATH = ".nostr_relays"
 
 func AddRelay(relayURL string) error {
-	file, err := os.OpenFile(PATH, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	dir, err := paths.GetSettingsDirectory()
+	if err != nil {
+		return err
+	}
+
+	filePath := filepath.Join(dir, PATH)
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return err
 	}
