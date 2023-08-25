@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nbd-wtf/go-nostr"
+	"github.com/nbd-wtf/go-nostr/nip19"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/consts"
 	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/relays"
 )
@@ -67,6 +68,54 @@ func Start(port string) {
 
 					ctx.Data(http.StatusOK, mTag.Value(), data)
 				}
+			default:
+				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+			}
+		} else {
+			ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+		}
+
+		return
+	})
+
+	// Replaceable Event (NIP-33)
+	r.GET("/p/:pubKey/d/:dTag", func(ctx *gin.Context) {
+		// pubKeyを取得しFilterに追加
+		pubKey := ctx.Param("pubKey")
+		// npubから始まる場合はデコードする
+		if pubKey[0:4] == "npub" {
+			_, v, err := nip19.Decode(pubKey)
+			if err != nil {
+				ctx.String(http.StatusBadRequest, "Invalid npub")
+				return
+			}
+			pubKey = v.(string)
+		}
+		authors := []string{pubKey}
+
+		// dTagを取得しFilterに追加
+		dTag := ctx.Param("dTag")
+		tags := nostr.TagMap{}
+		tags["d"] = []string{dTag}
+
+		// Poolからデータを取得する
+		ev := pool.QuerySingle(ctx, allRelays, nostr.Filter{
+			Kinds: []int{
+				consts.KindWebhostReplaceableHTML,
+				consts.KindWebhostReplaceableCSS,
+				consts.KindWebhostReplaceableJS,
+			},
+			Authors: authors,
+			Tags:    tags,
+		})
+		if ev != nil {
+			switch ev.Kind {
+			case consts.KindWebhostReplaceableHTML:
+				ctx.Data(http.StatusOK, "text/html", []byte(ev.Content))
+			case consts.KindWebhostReplaceableCSS:
+				ctx.Data(http.StatusOK, "text/css", []byte(ev.Content))
+			case consts.KindWebhostReplaceableJS:
+				ctx.Data(http.StatusOK, "text/javascript", []byte(ev.Content))
 			default:
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 			}
