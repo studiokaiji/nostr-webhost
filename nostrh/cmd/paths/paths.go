@@ -14,6 +14,8 @@ func GetSettingsDirectory() (string, error) {
 	}
 
 	dirPath := filepath.Join(homeDir, BaseDirName)
+
+	_, err = os.Stat(dirPath)
 	if os.IsNotExist(err) {
 		// ディレクトリが存在しない場合に作成
 		err = os.Mkdir(dirPath, 0700)
@@ -21,7 +23,7 @@ func GetSettingsDirectory() (string, error) {
 			return "", err
 		}
 	} else if err != nil {
-		return "", err
+		return "", nil
 	}
 
 	return dirPath, nil
