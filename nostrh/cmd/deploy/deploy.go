@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"net/url"
 	"os"
@@ -52,8 +51,8 @@ func pathToKind(path string, replaceable bool) (int, error) {
 
 // Replaceableにする場合のidentifier(dタグ)を取得
 func getReplaceableIdentifier(indexHtmlIdentifier, filePath string) string {
-	encodedFilePath := base64.StdEncoding.EncodeToString([]byte(filePath))
-	return indexHtmlIdentifier + ":" + encodedFilePath
+	encodedFilePath := strings.ReplaceAll(filePath, "/", "_")
+	return indexHtmlIdentifier + "-" + encodedFilePath
 }
 
 var nostrEventsQueue []*nostr.Event
@@ -212,8 +211,6 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, e
 	}
 	addNostrEventQueue(event)
 	fmt.Println("Added", filePath, "event to publish queue")
-
-	fmt.Println(event)
 
 	return publishEventsFromQueue()
 }
