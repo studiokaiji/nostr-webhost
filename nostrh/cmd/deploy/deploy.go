@@ -170,7 +170,7 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, e
 	}
 
 	// htmlIdentifierの存在チェック
-	if len(htmlIdentifier) < 1 {
+	if replaceable && len(htmlIdentifier) < 1 {
 		// htmlIdentifierが指定されていない場合はユーザー入力を受け取る
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("⌨️ Please type identifier: ")
