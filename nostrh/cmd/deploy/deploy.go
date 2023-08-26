@@ -84,6 +84,11 @@ func publishEventsFromQueue() (string, error) {
 		relays = append(relays, relay)
 	}
 
+	// すべてのリレーへの接続に失敗した場合はエラーを返す
+	if len(relays) < 1 {
+		return "", fmt.Errorf("Failed to connect to all relay.")
+	}
+
 	// Publishの進捗状況を表示
 	allEventsCount := len(nostrEventsQueue)
 	uploadedFilesCount := 0
