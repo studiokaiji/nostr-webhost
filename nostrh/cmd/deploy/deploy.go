@@ -86,9 +86,7 @@ func publishEventsFromQueue() (string, error) {
 
 	// すべてのリレーへの接続に失敗した場合はエラーを返す
 	if len(relays) < 1 {
-		const failedToConnectToAllRelayErrorText = "Failed to connect to all relay."
-		fmt.Println("❌", failedToConnectToAllRelayErrorText)
-		return "", fmt.Errorf(failedToConnectToAllRelayErrorText)
+		return "", fmt.Errorf("Failed to connect to all relay.")
 	}
 
 	// Publishの進捗状況を表示
