@@ -50,7 +50,7 @@ func RemoveRelay(targetURL string) error {
 	}
 
 	newContent := strings.Join(newLines, "\n")
-	err = os.WriteFile(PATH, []byte(newContent), 0644)
+	err = os.WriteFile(filePath, []byte(newContent), 0644)
 
 	return err
 }
