@@ -84,11 +84,6 @@ func publishEventsFromQueue() (string, error) {
 		relays = append(relays, relay)
 	}
 
-	// すべてのリレーへの接続に失敗した場合はエラーを返す
-	if len(relays) < 1 {
-		return "", fmt.Errorf("Failed to connect to all relay.")
-	}
-
 	// Publishの進捗状況を表示
 	allEventsCount := len(nostrEventsQueue)
 	uploadedFilesCount := 0
@@ -133,11 +128,8 @@ func publishEventsFromQueue() (string, error) {
 }
 
 func isExternalURL(urlStr string) bool {
-	_, err := url.Parse(urlStr)
-	if err != nil {
-		return false
-	}
-	return false
+	u, err := url.Parse(urlStr)
+	return err == nil && u.Scheme != "" && u.Host != ""
 }
 
 func isValidFileType(str string) bool {
