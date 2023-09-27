@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/paths"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/paths"
 )
 
 const PATH = ".nostr_relays"
