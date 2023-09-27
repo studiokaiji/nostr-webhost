@@ -13,7 +13,7 @@ Domain-based authorization mechanisms such as NIP-7 should not currently be used
 
 To get started with Nostr Webhost, follow these steps:
 
-1. `go install github.com/studiokaiji/nostr-webhost/nostrh@latest`
+1. `go install github.com/studiokaiji/nostr-webhost/hostr@latest`
 
 ### ⌨️ Commands
 
@@ -34,15 +34,15 @@ COMMANDS:
 
 1. Install Nostr Webhost as mentioned above.
 2. Set or generate private key
-If you set private key: `nostrh set-private "nsec or hex private key"`
-Or if you want to generate private key: `nostrh generate-key`
+If you set private key: `hostr set-private "nsec or hex private key"`
+Or if you want to generate private key: `hostr generate-key`
 3. Add relay
-`nostrh add-relay wss://r.hostr.cc`
+`hostr add-relay wss://r.hostr.cc`
 4. Deploy
-`nostrh deploy /BUILT/SPA/DIR/PATH`
+`hostr deploy /BUILT/SPA/DIR/PATH`
 The event id of index.html will be output after deploy. Please make a copy of it.
 5. Start test web server
-`nostrh start`
+`hostr start`
 6. Access the `http://localhost:3000/e/{event-id-of-index.html}`
 
 For detailed information on how to use each command, you can use the `help` command followed by the specific command name.

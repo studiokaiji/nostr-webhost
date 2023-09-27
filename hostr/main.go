@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/deploy"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/keystore"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/relays"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/server"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/deploy"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/keystore"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/relays"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/server"
 	"github.com/urfave/cli/v2"
 )
 
@@ -127,7 +127,7 @@ func main() {
 					key := nostr.GeneratePrivateKey()
 					err := keystore.SetSecret(key)
 					if err == nil {
-						fmt.Print("🗝  Generated key\n🗝  You can check the public key with 'nostrh show-public'\n")
+						fmt.Print("🗝  Generated key\n🗝  You can check the public key with 'hostr show-public'\n")
 					}
 					return err
 				},

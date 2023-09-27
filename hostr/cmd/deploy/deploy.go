@@ -12,10 +12,10 @@ import (
 	"sync"
 
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/consts"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/keystore"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/relays"
-	"github.com/studiokaiji/nostr-webhost/nostrh/cmd/tools"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/consts"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/keystore"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/relays"
+	"github.com/studiokaiji/nostr-webhost/hostr/cmd/tools"
 	"golang.org/x/net/html"
 )
 
