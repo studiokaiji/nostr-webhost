@@ -36,13 +36,13 @@ func main() {
 					&cli.BoolFlag{
 						Name:    "replaceable",
 						Aliases: []string{"r"},
-						Usage:   "🧪 Experimental: Specify 'true' explicitly when using NIP-33",
-						Value:   false,
+						Usage:   "Specify 'true' explicitly when using NIP-33",
+						Value:   true,
 					},
 					&cli.StringFlag{
 						Name:    "identifier",
 						Aliases: []string{"d"},
-						Usage:   "🧪 Experimental: index.html identifier (valid only if replaceable option is true)",
+						Usage:   "index.html identifier (valid only if replaceable option is true)",
 					},
 				},
 				Action: func(ctx *cli.Context) error {
@@ -51,7 +51,7 @@ func main() {
 					path := ctx.String("path")
 					replaceable := ctx.Bool("replaceable")
 					dTag := ctx.String("identifier")
-					
+
 					indexEventId, err := deploy.Deploy(path, replaceable, dTag)
 					if err == nil {
 						fmt.Println("🌐 Deploy Complete!")
