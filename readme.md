@@ -39,8 +39,9 @@ Or if you want to generate private key: `hostr generate-key`
 3. Add relay
 `hostr add-relay wss://r.hostr.cc`
 4. Deploy
-`hostr deploy /BUILT/SPA/DIR/PATH`
-The event id of index.html will be output after deploy. Please make a copy of it.
+`hostr deploy --path /BUILT/SPA/DIR/PATH --identifier=test`
+   - The `--identifier` option is the identifier (d-tag) for Replaceable Events based on NIP-33. When you update this site, please specify the same identifier. If you want to create a non-replaceable site, you can achieve that by specifying `--replaceable=false`.
+   - The event id of index.html will be output after deploy. Please make a copy of it.
 5. Start test web server
 `hostr start`
 6. Access the `http://localhost:3000/e/{event-id-of-index.html}`
