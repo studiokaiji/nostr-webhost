@@ -4,14 +4,14 @@ Example webpage: https://h.hostr.cc/p/a5a44e2a531efcc86491c4b9a3fa67daee8f60c9d2
 
 ## 🌐 Overview
 
-Nostr Webhost is a command-line tool designed for hosting Single Page Applications (SPAs) using the Nostr protocol and its distributed network of relay servers. This tool provides a seamless way to deploy and access your SPA on the Nostr network.
+Nostr Webhost (hostr) is a command-line tool designed for hosting Single Page Applications (SPAs) using the Nostr protocol and its distributed network of relay servers. This tool provides a seamless way to deploy and access your SPA on the Nostr network.
 
 ## ⚠️ Caution
 Domain-based authorization mechanisms such as NIP-7 should not currently be used. This is because the event is identified based on the path, so it will authorize other events as well.
 
 ### 📦 Installation
 
-To get started with Nostr Webhost, follow these steps:
+To get started with hostr, follow these steps:
 
 1. `go install github.com/studiokaiji/nostr-webhost/hostr@latest`
 
