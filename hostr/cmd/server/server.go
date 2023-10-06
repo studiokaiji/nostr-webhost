@@ -44,6 +44,7 @@ func Start(port string) {
 			}
 
 			ids = append(ids, data.ID)
+			allRelays = append(allRelays, data.Relays...)
 		}
 
 		// Poolからデータを取得する
