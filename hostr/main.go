@@ -52,10 +52,19 @@ func main() {
 					replaceable := ctx.Bool("replaceable")
 					dTag := ctx.String("identifier")
 
-					indexEventId, err := deploy.Deploy(path, replaceable, dTag)
+					id, encoded, err := deploy.Deploy(path, replaceable, dTag)
 					if err == nil {
 						fmt.Println("🌐 Deploy Complete!")
-						fmt.Println("🌐 index.html Event ID:", indexEventId)
+						fmt.Println("index.html:")
+						fmt.Println(" - event.id:", id)
+
+						label := " - "
+						if replaceable {
+							label += "naddr"
+						} else {
+							label += "nevent"
+						}
+						fmt.Printf("%s: %s\n", label, encoded)
 					}
 					return err
 				},
