@@ -24,14 +24,33 @@ func Start(port string) {
 
 	r := gin.Default()
 
-	r.GET("/e/:idHex", func(ctx *gin.Context) {
-		// IDを取得
-		id := ctx.Param("idHex")
+	r.GET("/e/:hex_or_nevent", func(ctx *gin.Context) {
+		hexOrNevent := ctx.Param("hex_or_nevent")
+
+		ids := []string{}
+
+		// neventからIDを取得
+		if hexOrNevent[0:6] == "nevent" {
+			_, res, err := nip19.Decode(hexOrNevent)
+			if err != nil {
+				ctx.String(http.StatusBadRequest, "Invalid nevent")
+				return
+			}
+
+			data, ok := res.(nostr.EventPointer)
+			if !ok {
+				ctx.String(http.StatusBadRequest, "Failed to decode nevent")
+				return
+			}
+
+			ids = append(ids, data.ID)
+			allRelays = append(allRelays, data.Relays...)
+		}
 
 		// Poolからデータを取得する
 		ev := pool.QuerySingle(ctx, allRelays, nostr.Filter{
 			Kinds: []int{consts.KindWebhostHTML, consts.KindWebhostCSS, consts.KindWebhostJS, consts.KindWebhostPicture},
-			IDs:   []string{id},
+			IDs:   ids,
 		})
 		if ev != nil {
 			switch ev.Kind {
