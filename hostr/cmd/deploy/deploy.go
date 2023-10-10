@@ -52,8 +52,7 @@ func pathToKind(path string, replaceable bool) (int, error) {
 
 // Replaceableにする場合のidentifier(dタグ)を取得
 func getReplaceableIdentifier(indexHtmlIdentifier, filePath string) string {
-	encodedFilePath := strings.ReplaceAll(filePath, "/", "_")
-	return indexHtmlIdentifier + "-" + encodedFilePath
+	return indexHtmlIdentifier + "/" + filePath[1:]
 }
 
 var nostrEventsQueue []*nostr.Event

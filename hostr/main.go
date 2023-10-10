@@ -58,13 +58,10 @@ func main() {
 						fmt.Println("index.html:")
 						fmt.Println(" - event.id:", id)
 
-						label := " - "
-						if replaceable {
-							label += "naddr"
-						} else {
-							label += "nevent"
+						if !replaceable {
+							label := " - nevent"
+							fmt.Printf("%s: %s\n", label, encoded)
 						}
-						fmt.Printf("%s: %s\n", label, encoded)
 					}
 					return err
 				},
