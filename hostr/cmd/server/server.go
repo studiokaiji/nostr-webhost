@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -98,7 +99,9 @@ func Start(port string) {
 	})
 
 	// Replaceable Event (NIP-33)
-	r.GET("/p/:pubKey/d/:dTag", func(ctx *gin.Context) {
+	r.GET("/p/:pubKey/d/*dTag", func(ctx *gin.Context) {
+		fmt.Println("hi")
+
 		// pubKeyを取得しFilterに追加
 		pubKey := ctx.Param("pubKey")
 		// npubから始まる場合はデコードする
@@ -113,9 +116,13 @@ func Start(port string) {
 		authors := []string{pubKey}
 
 		// dTagを取得しFilterに追加
-		dTag := ctx.Param("dTag")
+		// dTagの最初は`/`ではじまるのでそれをslice
+		dTag := ctx.Param("dTag")[1:]
+
 		tags := nostr.TagMap{}
 		tags["d"] = []string{dTag}
+
+		fmt.Println(dTag)
 
 		// Poolからデータを取得する
 		ev := pool.QuerySingle(ctx, allRelays, nostr.Filter{
