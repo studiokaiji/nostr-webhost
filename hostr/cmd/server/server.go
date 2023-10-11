@@ -45,6 +45,8 @@ func Start(port string) {
 
 			ids = append(ids, data.ID)
 			allRelays = append(allRelays, data.Relays...)
+		} else {
+			ids = append(ids, hexOrNevent)
 		}
 
 		// Poolからデータを取得する
