@@ -77,8 +77,9 @@ func Start(port string, mode string) {
 			contentType, err := tools.GetContentType(ev.Kind)
 			if err != nil {
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+			} else {
+				ctx.Data(http.StatusOK, contentType, []byte(ev.Content))
 			}
-			ctx.Data(http.StatusOK, contentType, []byte(ev.Content))
 		} else {
 			ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 		}
