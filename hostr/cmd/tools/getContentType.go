@@ -7,14 +7,13 @@ import (
 )
 
 func GetContentType(kind int) (string, error) {
-	switch kind {
-	case consts.KindWebhostHTML | consts.KindWebhostReplaceableHTML:
+	if kind == consts.KindWebhostHTML || kind == consts.KindWebhostReplaceableHTML {
 		return "text/html; charset=utf-8", nil
-	case consts.KindWebhostCSS | consts.KindWebhostReplaceableCSS:
+	} else if kind == consts.KindWebhostCSS || kind == consts.KindWebhostReplaceableCSS {
 		return "text/css; charset=utf-8", nil
-	case consts.KindWebhostJS | consts.KindWebhostReplaceableJS:
+	} else if kind == consts.KindWebhostJS || kind == consts.KindWebhostReplaceableJS {
 		return "text/javascript; charset=utf-8", nil
-	default:
+	} else {
 		return "", fmt.Errorf("Invalid Kind")
 	}
 }
