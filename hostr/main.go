@@ -17,10 +17,6 @@ import (
 var cuteOstrich string
 
 func main() {
-	var (
-		port string
-	)
-
 	app := &cli.App{
 		Commands: []*cli.Command{
 			{
@@ -143,15 +139,28 @@ func main() {
 				Usage: "🕺 Wake up web server",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
-						Name:        "port",
-						Aliases:     []string{"p"},
-						Value:       "3000",
-						Usage:       "Web server port",
-						Destination: &port,
+						Name:    "port",
+						Aliases: []string{"p"},
+						Value:   "3000",
+						Usage:   "Web server port",
+					},
+					&cli.StringFlag{
+						Name:    "mode",
+						Aliases: []string{"m"},
+						Value:   "normal",
+						Usage:   "🧪 Experimental: Enabled subdomain-based access in replaceable events.",
+						Action: func(ctx *cli.Context, v string) error {
+							if v != "normal" && v != "hybrid" && v != "secure" {
+								return fmt.Errorf("Invalid mode flag. Must be 'normal', 'hybrid', or 'secure'.")
+							}
+							return nil
+						},
 					},
 				},
 				Action: func(ctx *cli.Context) error {
-					server.Start(port)
+					port := ctx.String("port")
+					mode := ctx.String("mode")
+					server.Start(port, mode)
 					return nil
 				},
 			},
