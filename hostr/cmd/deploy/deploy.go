@@ -137,7 +137,7 @@ func isExternalURL(urlStr string) bool {
 	return err == nil && u.Scheme != "" && u.Host != ""
 }
 
-func isValidFileType(str string) bool {
+func isValidBasicFileType(str string) bool {
 	return strings.HasSuffix(str, ".html") || strings.HasSuffix(str, ".css") || strings.HasSuffix(str, ".js")
 }
 
@@ -230,7 +230,7 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 	if n.Type == html.ElementNode && (n.Data == "link" || n.Data == "script") {
 		for i, a := range n.Attr {
 			// href,srcのうち、外部URLでないものかつ. html, .css, .js のみ変換する
-			if (a.Key == "href" || a.Key == "src") && !isExternalURL(a.Val) && isValidFileType(a.Val) {
+			if (a.Key == "href" || a.Key == "src") && !isExternalURL(a.Val) && isValidBasicFileType(a.Val) {
 				filePath := filepath.Join(basePath, a.Val)
 
 				// kindを取得
