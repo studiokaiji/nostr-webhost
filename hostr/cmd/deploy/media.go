@@ -1,7 +1,13 @@
 package deploy
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"os"
 	"strings"
 	"sync"
 
@@ -117,4 +123,74 @@ func uploadMediaFilesFromQueue() {
 	}
 
 	wg.Wait()
+}
+
+func filePathToUploadMediaRequest(filePath, priKey, pubKey string) (*http.Request, error) {
+	// ファイルを開く
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to read %s: %w", filePath, err)
+	}
+	defer file.Close()
+
+	// リクエストボディのバッファを初期化
+	var requestBody bytes.Buffer
+	// multipart writerを作成
+	writer := multipart.NewWriter(&requestBody)
+
+	// uploadtypeフィールドを設定
+	err = writer.WriteField("uploadtype", "media")
+	if err != nil {
+		return nil, fmt.Errorf("Error writing field: %w", err)
+	}
+
+	// mediafileフィールドを作成
+	part, err := writer.CreateFormFile("mediafile", filePath)
+	if err != nil {
+		return nil, fmt.Errorf("Error creating form file: %w", err)
+	}
+
+	// ファイルの内容をpartにコピー
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return nil, fmt.Errorf("Error copying file: %w", err)
+	}
+
+	// writerを閉じてリクエストボディを完成させる
+	err = writer.Close()
+	if err != nil {
+		return nil, fmt.Errorf("Error closing writer: %w", err)
+	}
+
+	// タグを初期化
+	tags := nostr.Tags{}
+	// タグを追加
+	tags.AppendUnique(nostr.Tag{"u", uploadEndpoint})
+	tags.AppendUnique(nostr.Tag{"method", "POST"})
+	tags.AppendUnique(nostr.Tag{"payload", ""})
+
+	// イベントを生成
+	ev, err := getEvent(priKey, pubKey, "", 27533, tags)
+	if err != nil {
+		return nil, fmt.Errorf("Error get event: %d", err)
+	}
+
+	// イベントをJSONにマーシャル
+	evJson, err := ev.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("Error marshaling event: %d", err)
+	}
+
+	// HTTPリクエストを作成
+	request, err := http.NewRequest("POST", uploadEndpoint, &requestBody)
+	if err != nil {
+		return nil, fmt.Errorf("Error creating request: %d", err)
+	}
+
+	// ヘッダーを設定
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	request.Header.Set("Authorization", "Nostr "+base64.StdEncoding.EncodeToString(evJson))
+	request.Header.Set("Accept", "application/json")
+
+	return request, nil
 }

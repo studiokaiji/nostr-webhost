@@ -3,11 +3,8 @@ package deploy
 import (
 	"bufio"
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -141,6 +138,12 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 						continue
 					}
 
+					// jsファイルを解析する
+					if strings.HasSuffix(basePath, ".js") {
+						jsContent := string(bytesContent)
+
+					}
+
 					// Tagsを追加
 					tags := nostr.Tags{}
 					// 置き換え可能なイベントの場合
@@ -176,82 +179,14 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 		} else if slices.Contains(availableMediaHtmlTags, n.Data) {
 			// 内部mediaファイルを対象にUpload Requestを作成
 			for i, a := range n.Attr {
-				if (a.Key == "href" || a.Key == "src") && !isExternalURL(a.Val) && isValidBasicFileType(a.Val) {
+				if (a.Key == "href" || a.Key == "src" || a.Key == "data") && !isExternalURL(a.Val) && isValidBasicFileType(a.Val) {
 					filePath := filepath.Join(basePath, a.Val)
 
-					// ファイルを開く
-					file, err := os.Open(filePath)
+					// アップロードのためのHTTPリクエストを取得
+					request, err := filePathToUploadMediaRequest(filePath, priKey, pubKey)
 					if err != nil {
-						fmt.Printf("❌ Failed to read %s: %d", filePath, err)
-						continue
+						fmt.Println("❌ Failed generate upload request: ", err)
 					}
-					defer file.Close()
-
-					// リクエストボディのバッファを初期化
-					var requestBody bytes.Buffer
-					// multipart writerを作成
-					writer := multipart.NewWriter(&requestBody)
-
-					// uploadtypeフィールドを設定
-					err = writer.WriteField("uploadtype", "media")
-					if err != nil {
-						fmt.Printf("❌ Error writing field: %d", err)
-						continue
-					}
-
-					// mediafileフィールドを作成
-					part, err := writer.CreateFormFile("mediafile", filePath)
-					if err != nil {
-						fmt.Printf("❌ Error creating form file: %d", err)
-						continue
-					}
-
-					// ファイルの内容をpartにコピー
-					_, err = io.Copy(part, file)
-					if err != nil {
-						fmt.Printf("❌ Error copying file: %d", err)
-						continue
-					}
-
-					// writerを閉じてリクエストボディを完成させる
-					err = writer.Close()
-					if err != nil {
-						fmt.Printf("❌ Error closing writer: %d", err)
-						continue
-					}
-
-					// タグを初期化
-					tags := nostr.Tags{}
-					// タグを追加
-					tags.AppendUnique(nostr.Tag{"u", uploadEndpoint})
-					tags.AppendUnique(nostr.Tag{"method", "POST"})
-					tags.AppendUnique(nostr.Tag{"payload", ""})
-
-					// イベントを取得
-					ev, err := getEvent(priKey, pubKey, "", 27533, tags)
-					if err != nil {
-						fmt.Printf("❌ Error get event: %d", err)
-						continue
-					}
-
-					// イベントをJSONにマーシャル
-					evJson, err := ev.MarshalJSON()
-					if err != nil {
-						fmt.Printf("❌ Error marshaling event: %d", err)
-						continue
-					}
-
-					// HTTPリクエストを作成
-					request, err := http.NewRequest("POST", uploadEndpoint, &requestBody)
-					if err != nil {
-						fmt.Printf("❌ Error creating request: %d", err)
-						continue
-					}
-
-					// ヘッダーを設定
-					request.Header.Set("Content-Type", writer.FormDataContentType())
-					request.Header.Set("Authorization", "Nostr "+base64.StdEncoding.EncodeToString(evJson))
-					request.Header.Set("Accept", "application/json")
 
 					// アップロード処理を代入
 					uploadFunc := func() (*MediaResult, error) {
@@ -259,8 +194,7 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 						client := &http.Client{}
 						response, err := client.Do(request)
 						if err != nil {
-							fmt.Errorf("❌ Error sending request: %w", err)
-
+							fmt.Errorf("Error sending request: %w", err)
 						}
 						defer response.Body.Close()
 
@@ -268,12 +202,12 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 						// ResultのDecode
 						err = json.NewDecoder(response.Body).Decode(result)
 						if err != nil {
-							return nil, fmt.Errorf("❌ Error decoding response: %w", err)
+							return nil, fmt.Errorf("Error decoding response: %w", err)
 						}
 
 						// アップロードに失敗した場合
 						if !result.result {
-							return nil, fmt.Errorf("❌ Failed to upload file: %w", err)
+							return nil, fmt.Errorf("Failed to upload file: %w", err)
 						}
 
 						// URLを割り当て
@@ -293,4 +227,8 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		convertLinks(priKey, pubKey, basePath, replaceable, indexHtmlIdentifier, c)
 	}
+}
+
+func convertLinksFromJS() {
+
 }
