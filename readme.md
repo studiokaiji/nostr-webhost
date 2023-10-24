@@ -1,6 +1,6 @@
 # Nostr Webhost (hostr)
 
-Example webpage: https://h.hostr.cc/p/a5a44e2a531efcc86491c4b9a3fa67daee8f60c9d2757a12eed95d98c5d6fc42/d/hostr-lp
+Example webpage: (https://h.hostr.cc/p/2d417bce8c10883803bc427703e3c4c024465c88e7063ed68f9dfeecf56911ac/d/hostr-lp
 
 ## 🌐 Overview
 
