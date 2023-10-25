@@ -137,3 +137,7 @@ func getReplaceableIdentifier(indexHtmlIdentifier, filePath string) string {
 }
 
 var nostrEventsQueue []*nostr.Event
+
+func addNostrEventQueue(event *nostr.Event) {
+	nostrEventsQueue = append(nostrEventsQueue, event)
+}
