@@ -141,7 +141,6 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 					// jsファイルを解析する
 					if strings.HasSuffix(basePath, ".js") {
 						jsContent := string(bytesContent)
-
 					}
 
 					// Tagsを追加
@@ -179,7 +178,7 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 		} else if slices.Contains(availableMediaHtmlTags, n.Data) {
 			// 内部mediaファイルを対象にUpload Requestを作成
 			for i, a := range n.Attr {
-				if (a.Key == "href" || a.Key == "src" || a.Key == "data") && !isExternalURL(a.Val) && isValidBasicFileType(a.Val) {
+				if (a.Key == "href" || a.Key == "src" || a.Key == "data") && !isExternalURL(a.Val) && isValidMediaFileType(a.Val) {
 					filePath := filepath.Join(basePath, a.Val)
 
 					// アップロードのためのHTTPリクエストを取得
@@ -189,12 +188,11 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 					}
 
 					// アップロード処理を代入
-					uploadFunc := func() (*MediaResult, error) {
-						// リクエストを送信
-						client := &http.Client{}
+					uploadFunc := func(client *http.Client) (*MediaResult, error) {
 						response, err := client.Do(request)
+						// リクエストを送信
 						if err != nil {
-							fmt.Errorf("Error sending request: %w", err)
+							return nil, fmt.Errorf("Error sending request: %w", err)
 						}
 						defer response.Body.Close()
 

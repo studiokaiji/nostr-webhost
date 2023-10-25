@@ -79,13 +79,13 @@ type MediaResult struct {
 	tags        []string
 }
 
-var mediaUploadRequestQueue []func() (*MediaResult, error)
+var mediaUploadRequestQueue []func(*http.Client) (*MediaResult, error)
 
 func addNostrEventQueue(event *nostr.Event) {
 	nostrEventsQueue = append(nostrEventsQueue, event)
 }
 
-func addMediaUploadRequestFuncQueue(reqFunc func() (*MediaResult, error)) {
+func addMediaUploadRequestFuncQueue(reqFunc func(client *http.Client) (*MediaResult, error)) {
 	mediaUploadRequestQueue = append(mediaUploadRequestQueue, reqFunc)
 }
 
@@ -106,11 +106,13 @@ func uploadMediaFilesFromQueue() {
 
 	var mutex sync.Mutex
 
+	client := &http.Client{}
+
 	// アップロードを並列処理
 	for _, reqFunc := range mediaUploadRequestQueue {
 		wg.Add(1)
-		go func(reqFun func() (*MediaResult, error)) {
-			_, err := reqFun()
+		go func(reqFun func(*http.Client) (*MediaResult, error)) {
+			_, err := reqFun(client)
 			if err != nil {
 				fmt.Println(err)
 				return
