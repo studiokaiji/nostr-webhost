@@ -3,9 +3,7 @@ package deploy
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -71,18 +69,20 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 	// リレーを取得
 	allRelays, err = relays.GetAllRelays()
 	if err != nil {
+		fmt.Println("❌ Failed to get all relays:", err)
+		return "", "", err
+	}
+
+
+	// basePath以下のMedia Fileのパスを全て羅列しアップロード
+	err = uploadAllValidStaticMediaFiles(priKey, pubKey, basePath)
+	if err != nil {
+		fmt.Println("❌ Failed to upload media:", err)
 		return "", "", err
 	}
 
 	// リンクの解析と変換
 	convertLinks(priKey, pubKey, basePath, replaceable, htmlIdentifier, doc)
-
-	if len(mediaUploadRequestQueue) > 0 {
-		// メディアのアップロード
-		fmt.Println("📷 Uploading media files")
-		uploadMediaFilesFromQueue()
-		fmt.Println("📷 Media upload finished.")
-	}
 
 	// 更新されたHTML
 	var buf bytes.Buffer
@@ -116,7 +116,12 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 	return eventId, encoded, err
 }
 
-func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlIdentifier string, n *html.Node) {
+func convertLinks(
+	priKey, pubKey, basePath string,
+	replaceable bool,
+	indexHtmlIdentifier string,
+	n *html.Node,
+) {
 	if n.Type == html.ElementNode {
 		if n.Data == "link" || n.Data == "script" {
 			// <link> と <script> タグを対象としてNostr Eventを作成
@@ -128,7 +133,7 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 					// kindを取得
 					kind, err := pathToKind(filePath, replaceable)
 					if err != nil {
-						continue
+						break
 					}
 
 					// contentを取得
@@ -138,10 +143,7 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 						continue
 					}
 
-					// jsファイルを解析する
-					if strings.HasSuffix(basePath, ".js") {
-						jsContent := string(bytesContent)
-					}
+					content := string(bytesContent)
 
 					// Tagsを追加
 					tags := nostr.Tags{}
@@ -153,8 +155,16 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 						n.Attr[i].Val = fileIdentifier
 					}
 
-					// Eventを生成し、キューに追加
-					event, err := getEvent(priKey, pubKey, string(bytesContent), kind, tags)
+					// jsファイルを解析する
+					if strings.HasSuffix(a.Val, ".js") {
+						// アップロード済みファイルの元パスとURLを取得
+						for path, url := range uploadedMediaFiles {
+							// JS内に該当ファイルがあったら置換
+							content = strings.ReplaceAll(content, path, url)
+						}
+					}
+
+					event, err := getEvent(priKey, pubKey, content, kind, tags)
 					if err != nil {
 						fmt.Println("❌ Failed to get event for", filePath, ":", err)
 						break
@@ -177,45 +187,22 @@ func convertLinks(priKey, pubKey, basePath string, replaceable bool, indexHtmlId
 			}
 		} else if slices.Contains(availableMediaHtmlTags, n.Data) {
 			// 内部mediaファイルを対象にUpload Requestを作成
-			for i, a := range n.Attr {
+			for _, a := range n.Attr {
 				if (a.Key == "href" || a.Key == "src" || a.Key == "data") && !isExternalURL(a.Val) && isValidMediaFileType(a.Val) {
 					filePath := filepath.Join(basePath, a.Val)
 
-					// アップロードのためのHTTPリクエストを取得
-					request, err := filePathToUploadMediaRequest(filePath, priKey, pubKey)
+					// contentを取得
+					bytesContent, err := os.ReadFile(filePath)
 					if err != nil {
-						fmt.Println("❌ Failed generate upload request: ", err)
+						fmt.Println("❌ Failed to read", filePath, ":", err)
+						continue
 					}
 
-					// アップロード処理を代入
-					uploadFunc := func(client *http.Client) (*MediaResult, error) {
-						response, err := client.Do(request)
-						// リクエストを送信
-						if err != nil {
-							return nil, fmt.Errorf("Error sending request: %w", err)
-						}
-						defer response.Body.Close()
+					content := string(bytesContent)
 
-						var result *MediaResult
-						// ResultのDecode
-						err = json.NewDecoder(response.Body).Decode(result)
-						if err != nil {
-							return nil, fmt.Errorf("Error decoding response: %w", err)
-						}
-
-						// アップロードに失敗した場合
-						if !result.result {
-							return nil, fmt.Errorf("Failed to upload file: %w", err)
-						}
-
-						// URLを割り当て
-						n.Attr[i].Val = result.url
-
-						return result, nil
+					if url, ok := uploadedMediaFiles[filePath]; ok {
+						content = strings.ReplaceAll(content, filePath, url)
 					}
-
-					// Queueにアップロード処理を追加
-					addMediaUploadRequestFuncQueue(uploadFunc)
 				}
 			}
 		}

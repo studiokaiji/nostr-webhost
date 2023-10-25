@@ -12,6 +12,8 @@ import (
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/tools"
 )
 
+var allRelays []string
+
 func getEvent(priKey, pubKey, content string, kind int, tags nostr.Tags) (*nostr.Event, error) {
 	ev := nostr.Event{
 		PubKey:    pubKey,
@@ -51,13 +53,13 @@ func publishEventsFromQueue(replaceable bool) (string, string) {
 
 	// Publishの進捗状況を表示
 	allEventsCount := len(nostrEventsQueue)
-	uploadedFilesCount := 0
+	uploadedMediaFilesCount := 0
 
 	var wg sync.WaitGroup
 
 	go func() {
 		wg.Add(1)
-		tools.DisplayProgressBar(&uploadedFilesCount, &allEventsCount)
+		tools.DisplayProgressBar(&uploadedMediaFilesCount, &allEventsCount)
 		wg.Done()
 	}()
 
@@ -74,17 +76,17 @@ func publishEventsFromQueue(replaceable bool) (string, string) {
 					continue
 				}
 			}
-			mutex.Lock()         // ロックして排他制御
-			uploadedFilesCount++ // カウントアップ
-			mutex.Unlock()       // ロック解除
-			wg.Done()            // ゴルーチンの終了を通知
+			mutex.Lock()              // ロックして排他制御
+			uploadedMediaFilesCount++ // カウントアップ
+			mutex.Unlock()            // ロック解除
+			wg.Done()                 // ゴルーチンの終了を通知
 		}(ev)
 	}
 
 	wg.Wait()
 
-	if uploadedFilesCount < allEventsCount {
-		fmt.Println("Failed to deploy", allEventsCount-uploadedFilesCount, "files.")
+	if uploadedMediaFilesCount < allEventsCount {
+		fmt.Println("Failed to deploy", allEventsCount-uploadedMediaFilesCount, "files.")
 	}
 
 	indexEvent := nostrEventsQueue[len(nostrEventsQueue)-1]
