@@ -25,7 +25,5 @@ jobs:
       - uses: goreleaser/goreleaser-action@v4
         with:
           args: release --clean
-          workdir: ./hostr
-          version: latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

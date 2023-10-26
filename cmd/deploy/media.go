@@ -14,7 +14,7 @@ import (
 	"sync"
 
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/tools"
+	"github.com/studiokaiji/nostr-webhost/cmd/tools"
 )
 
 var availableContentTypes = []string{

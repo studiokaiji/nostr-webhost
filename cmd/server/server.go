@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip19"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/consts"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/relays"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/tools"
+	"github.com/studiokaiji/nostr-webhost/cmd/consts"
+	"github.com/studiokaiji/nostr-webhost/cmd/relays"
+	"github.com/studiokaiji/nostr-webhost/cmd/tools"
 )
 
 func Start(port string, mode string) {

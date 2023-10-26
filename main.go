@@ -7,10 +7,10 @@ import (
 
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip19"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/deploy"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/keystore"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/relays"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/server"
+	"github.com/studiokaiji/nostr-webhost/cmd/deploy"
+	"github.com/studiokaiji/nostr-webhost/cmd/keystore"
+	"github.com/studiokaiji/nostr-webhost/cmd/relays"
+	"github.com/studiokaiji/nostr-webhost/cmd/server"
 	"github.com/urfave/cli/v2"
 )
 

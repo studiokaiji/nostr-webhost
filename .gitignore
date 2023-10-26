@@ -1,1 +1,4 @@
 /nostr-rs-relay/data
+
+main
+dist/

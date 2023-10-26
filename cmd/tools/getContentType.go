@@ -3,7 +3,7 @@ package tools
 import (
 	"fmt"
 
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/consts"
+	"github.com/studiokaiji/nostr-webhost/cmd/consts"
 )
 
 func GetContentType(kind int) (string, error) {

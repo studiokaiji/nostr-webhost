@@ -1,4 +1,4 @@
-module github.com/studiokaiji/nostr-webhost/hostr
+module github.com/studiokaiji/nostr-webhost
 
 go 1.21
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/nbd-wtf/go-nostr/nip19"
-	"github.com/studiokaiji/nostr-webhost/hostr/cmd/paths"
+	"github.com/studiokaiji/nostr-webhost/cmd/paths"
 )
 
 const PATH = ".nostr_account_secret"
