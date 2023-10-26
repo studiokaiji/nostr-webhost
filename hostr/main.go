@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/nbd-wtf/go-nostr"
+	"github.com/nbd-wtf/go-nostr/nip19"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/deploy"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/keystore"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/relays"
@@ -48,16 +49,38 @@ func main() {
 					replaceable := ctx.Bool("replaceable")
 					dTag := ctx.String("identifier")
 
-					id, encoded, err := deploy.Deploy(path, replaceable, dTag)
+					_, encoded, err := deploy.Deploy(path, replaceable, dTag)
 					if err == nil {
 						fmt.Println("🌐 Deploy Complete!")
-						fmt.Println("index.html:")
-						fmt.Println(" - event.id:", id)
 
-						if !replaceable {
-							label := " - nevent"
-							fmt.Printf("%s: %s\n", label, encoded)
+						pubkey, err := keystore.GetPublic()
+						if err != nil {
+							os.Exit(1)
 						}
+						npub, err := nip19.EncodePublicKey(pubkey)
+						if err != nil {
+							os.Exit(1)
+						}
+
+						defaultModeUrl := "https://h.hostr.cc"
+						secureModeUrl := fmt.Sprintf("https://%s.h.hostr.cc", npub)
+
+						if replaceable {
+							defaultModeUrl = fmt.Sprintf("%s/p/%s/d/%s", defaultModeUrl, npub, dTag)
+							secureModeUrl = fmt.Sprintf("%s/d/%s", secureModeUrl, dTag)
+						} else {
+							defaultModeUrl = fmt.Sprintf("%s/e/%s", defaultModeUrl, encoded)
+							secureModeUrl = fmt.Sprintf("%s/e/%s", secureModeUrl, encoded)
+						}
+
+						fmt.Println("\n\033[1m========= 🚵 Access To =========\033")
+
+						fmt.Printf("\n\033[1m🗃️  Default Mode:\033[0m\n\x1b[36m%s\x1b[0m\n", defaultModeUrl)
+						fmt.Printf("\033[1m\n🔑 Secure Mode:\033[0m\n\x1b[36m%s\x1b[0m\n", secureModeUrl)
+
+						fmt.Printf("\n\x1b[90mh.hostr.cc is just one endpoint, so depending on the relay configuration, it may not be accessible.\x1b[0m\n")
+
+						fmt.Printf("\n\033[1m=================================\033\n")
 					}
 					return err
 				},
