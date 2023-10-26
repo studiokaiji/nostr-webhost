@@ -26,5 +26,6 @@ jobs:
         with:
           args: release --clean
           workdir: ./hostr
+          version: latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
