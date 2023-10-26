@@ -21,10 +21,15 @@ jobs:
         with:
           go-version: "1.21.0"
 
+      # タグ名を抽出
+      - name: Get the version
+        id: get_version
+        run: echo "::set-output name=VERSION::${GITHUB_REF#refs/tags/}"
+
       # リリース
       - uses: goreleaser/goreleaser-action@v4
         with:
-          args: release --clean
+          args: release --clean  --override-name ${{ steps.get_version.outputs.VERSION }}
           workdir: ./hostr
           version: latest
         env:
