@@ -23,7 +23,7 @@ func isExternalURL(urlStr string) bool {
 	return err == nil && u.Scheme != "" && u.Host != ""
 }
 
-func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, string, error) {
+func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, string, string, error) {
 	// 引数からデプロイしたいサイトのパスを受け取る。
 	filePath := filepath.Join(basePath, "index.html")
 
@@ -31,26 +31,26 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		fmt.Println("❌ Failed to read index.html:", err)
-		return "", "", err
+		return "", "", "", err
 	}
 
 	// HTMLの解析
 	doc, err := html.Parse(bytes.NewReader(content))
 	if err != nil {
 		fmt.Println("❌ Failed to parse index.html:", err)
-		return "", "", err
+		return "", "", "", err
 	}
 
 	// Eventの取得に必要になるキーペアを取得
 	priKey, err := keystore.GetSecret()
 	if err != nil {
 		fmt.Println("❌ Failed to get private key:", err)
-		return "", "", err
+		return "", "", "", err
 	}
 	pubKey, err := nostr.GetPublicKey(priKey)
 	if err != nil {
 		fmt.Println("❌ Failed to get public key:", err)
-		return "", "", err
+		return "", "", "", err
 	}
 
 	// htmlIdentifierの存在チェック
@@ -70,15 +70,14 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 	allRelays, err = relays.GetAllRelays()
 	if err != nil {
 		fmt.Println("❌ Failed to get all relays:", err)
-		return "", "", err
+		return "", "", "", err
 	}
-
 
 	// basePath以下のMedia Fileのパスを全て羅列しアップロード
 	err = uploadAllValidStaticMediaFiles(priKey, pubKey, basePath)
 	if err != nil {
 		fmt.Println("❌ Failed to upload media:", err)
-		return "", "", err
+		return "", "", "", err
 	}
 
 	// リンクの解析と変換
@@ -106,14 +105,14 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 	event, err := getEvent(priKey, pubKey, strHtml, indexHtmlKind, tags)
 	if err != nil {
 		fmt.Println("❌ Failed to get public key:", err)
-		return "", "", err
+		return "", "", "", err
 	}
 	addNostrEventQueue(event)
 	fmt.Println("Added", filePath, "event to publish queue")
 
 	eventId, encoded := publishEventsFromQueue(replaceable)
 
-	return eventId, encoded, err
+	return eventId, encoded, htmlIdentifier, err
 }
 
 func convertLinks(

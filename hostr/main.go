@@ -49,7 +49,7 @@ func main() {
 					replaceable := ctx.Bool("replaceable")
 					dTag := ctx.String("identifier")
 
-					_, encoded, err := deploy.Deploy(path, replaceable, dTag)
+					_, encoded, dTag, err := deploy.Deploy(path, replaceable, dTag)
 					if err == nil {
 						fmt.Println("🌐 Deploy Complete!")
 
