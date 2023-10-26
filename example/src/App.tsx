@@ -1,41 +1,15 @@
-import { useEffect, useMemo } from "react";
 import { H1 } from "./components/H1";
 import { Link } from "./components/Link";
 
 function App() {
-  const htmlId = useMemo(() => window.location.pathname.split("/")[2], []);
-  const cssId = useMemo(
-    () => Array.from(document.styleSheets)[0].href?.split("/").slice(-1)[0],
-    []
-  );
-  const jsId = useMemo(
-    () => Array.from(document.scripts)[0].src?.split("/").slice(-1)[0],
-    []
-  );
-
-  useEffect(() => {
-    console.log(Array.from(document.styleSheets));
-  }, []);
-
   return (
-    <div className="font-body font-medium">
-      <div className="h-screen relative w-full bg-primary text-white space-y-7 p-7">
+    <div className="font-body font-medium p-7">
+      <div className="h-screen relative w-full text-white space-y-7">
         <H1 className="!leading-[0.8]">
           Nostr
           <br />
           WebHost
         </H1>
-        <div>
-          <p>
-            Relay URL:{" "}
-            <Link href="wss://hostr.cc">
-              wss://hostr.cc
-            </Link>
-          </p>
-          <p>HTML ID: {htmlId}</p>
-          <p>CSS ID: {cssId}</p>
-          <p>Javascript ID: {jsId}</p>
-        </div>
         <div>
           <p>
             GitHub:{" "}
@@ -56,10 +30,36 @@ function App() {
               https://github.com/studiokaiji
             </Link>
           </p>
+          <p>Lightning Address: floppystore07@walletofsatoshi.com</p>
         </div>
-        <p className="absolute right-7 bottom-7">
-          😩{"<"}Hmmm... I want to ride an ostrich...
-        </p>
+
+        <div className="text-6xl font-extrabold bg-rainbow-gradient bg-clip-text text-transparent">
+          ↓↓ CUTE OSTRICHES GALLERY ↓↓
+        </div>
+
+        <div className="flex flex-wrap">
+          <img
+            src="/DALL·E Ostrich on Jamaican Beach.png"
+            width={512}
+            height={512}
+          />
+          <img src="/DALL·E Ostrich Hero.png" width={512} height={512} />
+          <img
+            src="/DALL·E Ostrich Illustration (1).png"
+            width={512}
+            height={512}
+          />
+          <img
+            src="/DALL·E Ostrich Illustration (2).png"
+            width={512}
+            height={512}
+          />
+          <img
+            src="/DALL·E Ostrich Illustration.png"
+            width={512}
+            height={512}
+          />
+        </div>
       </div>
     </div>
   );
