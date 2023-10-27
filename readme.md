@@ -50,7 +50,7 @@ For detailed information on how to use each command, you can use the `help` comm
 
 ## 👍 Feedback and Contributions
 
-If you encounter any issues or have suggestions for improvement, feel free to contribute to the project on GitHub [link to GitHub repository].
+If you encounter any issues or have suggestions for improvement, feel free to contribute to the project on GitHub.
 
 ## 📃 License
 
