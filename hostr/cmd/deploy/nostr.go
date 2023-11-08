@@ -140,6 +140,7 @@ func getReplaceableIdentifier(indexHtmlIdentifier, filePath string) string {
 
 var nostrEventsQueue []*nostr.Event
 
-func addNostrEventQueue(event *nostr.Event) {
+func addNostrEventQueue(event *nostr.Event, filePath string) {
 	nostrEventsQueue = append(nostrEventsQueue, event)
+	fmt.Println("Added", filePath, "event to publish queue")
 }

@@ -72,6 +72,19 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 		return "", "", "", err
 	}
 
+	// basePath以下のText Fileのパスをすべて羅列する
+	err = generateEventsAndAddQueueAllValidStaticTextFiles(
+		priKey,
+		pubKey,
+		htmlIdentifier,
+		basePath,
+		replaceable,
+	)
+	if err != nil {
+		fmt.Println("❌ Failed to convert text files:", err)
+		return "", "", "", err
+	}
+
 	// basePath以下のMedia Fileのパスを全て羅列しアップロード
 	err = uploadAllValidStaticMediaFiles(priKey, pubKey, basePath)
 	if err != nil {
@@ -106,8 +119,8 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 		fmt.Println("❌ Failed to get public key:", err)
 		return "", "", "", err
 	}
-	addNostrEventQueue(event)
-	fmt.Println("Added", filePath, "event to publish queue")
+
+	addNostrEventQueue(event, filePath)
 
 	eventId, encoded := publishEventsFromQueue(replaceable)
 
@@ -168,8 +181,7 @@ func convertLinks(
 						break
 					}
 
-					addNostrEventQueue(event)
-					fmt.Println("Added", filePath, "event to publish queue")
+					addNostrEventQueue(event, filePath)
 
 					// 置き換え可能なイベントでない場合
 					if !replaceable {
