@@ -17,22 +17,6 @@ import (
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/tools"
 )
 
-var availableContentTypes = []string{
-	"image/png",
-	"image/jpg",
-	"image/jpeg",
-	"image/gif",
-	"image/webp",
-	"video/mp4",
-	"video/quicktime",
-	"video/mpeg",
-	"video/webm",
-	"audio/mpeg",
-	"audio/mpg",
-	"audio/mpeg3",
-	"audio/mp3",
-}
-
 var availableContentSuffixes = []string{
 	".png",
 	".jpg",
