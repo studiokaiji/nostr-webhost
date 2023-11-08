@@ -212,7 +212,3 @@ func convertLinks(
 		convertLinks(priKey, pubKey, basePath, replaceable, indexHtmlIdentifier, c)
 	}
 }
-
-func convertLinksFromJS() {
-
-}
