@@ -64,19 +64,19 @@ type MediaResult struct {
 }
 
 // [元パス]:[URL]の形で記録する
-var uploadedMediaFiles = map[string]string{}
+var uploadedMediaFilePathToURL = map[string]string{}
 
 func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 	client := &http.Client{}
 
-	var uploadedMediaFilesCount = 0
+	var uploadedMediaFilePathToURLCount = 0
 	var allMediaFilesCount = len(requests)
 
 	var wg sync.WaitGroup
 
 	go func() {
 		wg.Add(1)
-		tools.DisplayProgressBar(&uploadedMediaFilesCount, &allMediaFilesCount)
+		tools.DisplayProgressBar(&uploadedMediaFilePathToURLCount, &allMediaFilesCount)
 		wg.Done()
 	}()
 
@@ -118,9 +118,9 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 				return
 			}
 
-			mutex.Lock()              // ロックして排他制御
-			uploadedMediaFilesCount++ // カウントアップ
-			uploadedMediaFiles[filePath] = result.Url
+			mutex.Lock()                      // ロックして排他制御
+			uploadedMediaFilePathToURLCount++ // カウントアップ
+			uploadedMediaFilePathToURL[filePath] = result.Url
 			mutex.Unlock() // ロック解除
 		}(filePath, req)
 	}

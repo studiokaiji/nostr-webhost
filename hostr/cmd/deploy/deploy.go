@@ -156,7 +156,7 @@ func convertLinks(
 					// jsファイルを解析する
 					if strings.HasSuffix(a.Val, ".js") {
 						// アップロード済みファイルの元パスとURLを取得
-						for path, url := range uploadedMediaFiles {
+						for path, url := range uploadedMediaFilePathToURL {
 							// JS内に該当ファイルがあったら置換
 							content = strings.ReplaceAll(content, path, url)
 						}

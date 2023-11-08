@@ -53,13 +53,13 @@ func publishEventsFromQueue(replaceable bool) (string, string) {
 
 	// Publishの進捗状況を表示
 	allEventsCount := len(nostrEventsQueue)
-	uploadedMediaFilesCount := 0
+	uploadedMediaFilePathToURLCount := 0
 
 	var wg sync.WaitGroup
 
 	go func() {
 		wg.Add(1)
-		tools.DisplayProgressBar(&uploadedMediaFilesCount, &allEventsCount)
+		tools.DisplayProgressBar(&uploadedMediaFilePathToURLCount, &allEventsCount)
 		wg.Done()
 	}()
 
@@ -76,17 +76,17 @@ func publishEventsFromQueue(replaceable bool) (string, string) {
 					continue
 				}
 			}
-			mutex.Lock()              // ロックして排他制御
-			uploadedMediaFilesCount++ // カウントアップ
-			mutex.Unlock()            // ロック解除
-			wg.Done()                 // ゴルーチンの終了を通知
+			mutex.Lock()                      // ロックして排他制御
+			uploadedMediaFilePathToURLCount++ // カウントアップ
+			mutex.Unlock()                    // ロック解除
+			wg.Done()                         // ゴルーチンの終了を通知
 		}(ev)
 	}
 
 	wg.Wait()
 
-	if uploadedMediaFilesCount < allEventsCount {
-		fmt.Println("Failed to deploy", allEventsCount-uploadedMediaFilesCount, "files.")
+	if uploadedMediaFilePathToURLCount < allEventsCount {
+		fmt.Println("Failed to deploy", allEventsCount-uploadedMediaFilePathToURLCount, "files.")
 	}
 
 	indexEvent := nostrEventsQueue[len(nostrEventsQueue)-1]
