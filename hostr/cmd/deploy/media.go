@@ -9,7 +9,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 
@@ -114,7 +113,7 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 
 func filePathToUploadMediaRequest(basePath, filePath, priKey, pubKey string) (*http.Request, error) {
 	// ファイルを開く
-	file, err := os.Open(filepath.Join(basePath, filePath))
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read %s: %w", filePath, err)
 	}

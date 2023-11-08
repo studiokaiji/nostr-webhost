@@ -23,13 +23,12 @@ func FindFilesWithBasePathBySuffixes(basePath string, suffixes []string) ([]stri
 				// ファイル名とサフィックスがマッチした場合
 				if strings.HasSuffix(strings.ToLower(info.Name()), strings.ToLower(suffix)) {
 					// フルパスからbasePathまでの相対パスを計算
-					relPath, err := filepath.Rel(basePath, path)
 					if err != nil {
 						fmt.Println("❌ Error calculating relative path:", err)
 						continue
 					}
 					// マッチするファイルの相対パスをスライスに追加
-					filePaths = append(filePaths, "/"+relPath)
+					filePaths = append(filePaths, path)
 					break
 				}
 			}
