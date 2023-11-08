@@ -14,7 +14,6 @@ import (
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/consts"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/keystore"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/relays"
-	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 )
 
@@ -181,26 +180,6 @@ func convertLinks(
 							break
 						}
 						n.Attr[i].Val = nevent
-					}
-				}
-			}
-		} else if slices.Contains(availableMediaHtmlTags, n.Data) {
-			// 内部mediaファイルを対象にUpload Requestを作成
-			for _, a := range n.Attr {
-				if (a.Key == "href" || a.Key == "src" || a.Key == "data") && !isExternalURL(a.Val) && isValidMediaFileType(a.Val) {
-					filePath := filepath.Join(basePath, a.Val)
-
-					// contentを取得
-					bytesContent, err := os.ReadFile(filePath)
-					if err != nil {
-						fmt.Println("❌ Failed to read", filePath, ":", err)
-						continue
-					}
-
-					content := string(bytesContent)
-
-					if url, ok := uploadedMediaFiles[filePath]; ok {
-						content = strings.ReplaceAll(content, filePath, url)
 					}
 				}
 			}
