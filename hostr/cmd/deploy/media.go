@@ -49,24 +49,6 @@ var availableContentSuffixes = []string{
 	".mp3",
 }
 
-var availableMediaHtmlTags = []string{
-	"img",
-	"audio",
-	"video",
-	"source",
-	"object",
-	"embed",
-}
-
-func isValidMediaFileType(path string) bool {
-	for _, suffix := range availableContentSuffixes {
-		if strings.HasSuffix(path, suffix) {
-			return true
-		}
-	}
-	return false
-}
-
 const uploadEndpoint = "https://nostrcheck.me/api/v1/media"
 
 type MediaResult struct {
