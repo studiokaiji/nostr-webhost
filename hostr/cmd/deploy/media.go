@@ -217,39 +217,7 @@ func filePathToUploadMediaRequest(basePath, filePath, priKey, pubKey string) (*h
 
 // basePath以下のMedia Fileのパスを全て羅列する
 func listAllValidStaticMediaFilePaths(basePath string) ([]string, error) {
-	mediaFilePaths := []string{}
-
-	err := filepath.Walk(basePath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// ディレクトリはスキップ
-		if !info.IsDir() {
-			// 各サフィックスに対してマッチングを試みる
-			for _, suffix := range availableContentSuffixes {
-				// ファイル名とサフィックスがマッチした場合
-				if strings.HasSuffix(strings.ToLower(info.Name()), strings.ToLower(suffix)) {
-					// フルパスからbasePathまでの相対パスを計算
-					relPath, err := filepath.Rel(basePath, path)
-					if err != nil {
-						fmt.Println("❌ Error calculating relative path:", err)
-						continue
-					}
-					// マッチするファイルの相対パスをスライスに追加
-					mediaFilePaths = append(mediaFilePaths, "/"+relPath)
-					break
-				}
-			}
-		}
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return mediaFilePaths, nil
+	return tools.FindFilesWithBasePathBySuffixes(basePath, availableContentSuffixes)
 }
 
 // basePath以下のMedia Fileのパスを全て羅列しアップロード
