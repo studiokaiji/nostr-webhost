@@ -2,7 +2,6 @@ package deploy
 
 import (
 	"encoding/base64"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -46,9 +45,6 @@ func generateEventsAndAddQueueAllValidStaticTextFiles(priKey, pubKey, indexHtmlI
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(basePath)
-	fmt.Println(filePaths)
 
 	for _, filePath := range filePaths {
 		// ファイルを開く
