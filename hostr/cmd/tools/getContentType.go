@@ -3,10 +3,17 @@ package tools
 import (
 	"fmt"
 
+	"github.com/nbd-wtf/go-nostr"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/consts"
 )
 
-func GetContentType(kind int) (string, error) {
+func GetContentType(event nostr.Event) (string, error) {
+	kind := event.Kind
+
+	if kind == "" {
+		
+	}
+
 	if kind == consts.KindWebhostHTML || kind == consts.KindWebhostReplaceableHTML {
 		return "text/html; charset=utf-8", nil
 	} else if kind == consts.KindWebhostCSS || kind == consts.KindWebhostReplaceableCSS {
