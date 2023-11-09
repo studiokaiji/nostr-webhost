@@ -85,6 +85,8 @@ type MediaResult struct {
 var uploadedMediaFiles = map[string]string{}
 
 func uploadMediaFiles(filePaths []string, requests []*http.Request) {
+	fmt.Println("Uploading media files...")
+
 	client := &http.Client{}
 
 	var uploadedMediaFilesCount = 0
@@ -139,6 +141,7 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 			mutex.Lock()              // ロックして排他制御
 			uploadedMediaFilesCount++ // カウントアップ
 			uploadedMediaFiles[filePath] = result.Url
+			fmt.Printf("Uploaded %s", filePath)
 			mutex.Unlock() // ロック解除
 		}(filePath, req)
 	}
