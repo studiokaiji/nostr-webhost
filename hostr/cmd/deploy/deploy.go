@@ -14,7 +14,6 @@ import (
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/consts"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/keystore"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/relays"
-	"golang.org/x/exp/slices"
 	"golang.org/x/net/html"
 )
 
@@ -73,6 +72,19 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 		return "", "", "", err
 	}
 
+	// basePath以下のText Fileのパスをすべて羅列する
+	err = generateEventsAndAddQueueAllValidStaticTextFiles(
+		priKey,
+		pubKey,
+		htmlIdentifier,
+		basePath,
+		replaceable,
+	)
+	if err != nil {
+		fmt.Println("❌ Failed to convert text files:", err)
+		return "", "", "", err
+	}
+
 	// basePath以下のMedia Fileのパスを全て羅列しアップロード
 	err = uploadAllValidStaticMediaFiles(priKey, pubKey, basePath)
 	if err != nil {
@@ -107,8 +119,8 @@ func Deploy(basePath string, replaceable bool, htmlIdentifier string) (string, s
 		fmt.Println("❌ Failed to get public key:", err)
 		return "", "", "", err
 	}
-	addNostrEventQueue(event)
-	fmt.Println("Added", filePath, "event to publish queue")
+
+	addNostrEventQueue(event, filePath)
 
 	eventId, encoded := publishEventsFromQueue(replaceable)
 
@@ -157,7 +169,7 @@ func convertLinks(
 					// jsファイルを解析する
 					if strings.HasSuffix(a.Val, ".js") {
 						// アップロード済みファイルの元パスとURLを取得
-						for path, url := range uploadedMediaFiles {
+						for path, url := range uploadedMediaFilePathToURL {
 							// JS内に該当ファイルがあったら置換
 							content = strings.ReplaceAll(content, path, url)
 						}
@@ -169,8 +181,7 @@ func convertLinks(
 						break
 					}
 
-					addNostrEventQueue(event)
-					fmt.Println("Added", filePath, "event to publish queue")
+					addNostrEventQueue(event, filePath)
 
 					// 置き換え可能なイベントでない場合
 					if !replaceable {
@@ -184,26 +195,6 @@ func convertLinks(
 					}
 				}
 			}
-		} else if slices.Contains(availableMediaHtmlTags, n.Data) {
-			// 内部mediaファイルを対象にUpload Requestを作成
-			for _, a := range n.Attr {
-				if (a.Key == "href" || a.Key == "src" || a.Key == "data") && !isExternalURL(a.Val) && isValidMediaFileType(a.Val) {
-					filePath := filepath.Join(basePath, a.Val)
-
-					// contentを取得
-					bytesContent, err := os.ReadFile(filePath)
-					if err != nil {
-						fmt.Println("❌ Failed to read", filePath, ":", err)
-						continue
-					}
-
-					content := string(bytesContent)
-
-					if url, ok := uploadedMediaFiles[filePath]; ok {
-						content = strings.ReplaceAll(content, filePath, url)
-					}
-				}
-			}
 		}
 	}
 
@@ -211,8 +202,4 @@ func convertLinks(
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		convertLinks(priKey, pubKey, basePath, replaceable, indexHtmlIdentifier, c)
 	}
-}
-
-func convertLinksFromJS() {
-
 }

@@ -9,29 +9,12 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/tools"
 )
-
-var availableContentTypes = []string{
-	"image/png",
-	"image/jpg",
-	"image/jpeg",
-	"image/gif",
-	"image/webp",
-	"video/mp4",
-	"video/quicktime",
-	"video/mpeg",
-	"video/webm",
-	"audio/mpeg",
-	"audio/mpg",
-	"audio/mpeg3",
-	"audio/mp3",
-}
 
 var availableContentSuffixes = []string{
 	".png",
@@ -49,24 +32,6 @@ var availableContentSuffixes = []string{
 	".mp3",
 }
 
-var availableMediaHtmlTags = []string{
-	"img",
-	"audio",
-	"video",
-	"source",
-	"object",
-	"embed",
-}
-
-func isValidMediaFileType(path string) bool {
-	for _, suffix := range availableContentSuffixes {
-		if strings.HasSuffix(path, suffix) {
-			return true
-		}
-	}
-	return false
-}
-
 const uploadEndpoint = "https://nostrcheck.me/api/v1/media"
 
 type MediaResult struct {
@@ -82,21 +47,21 @@ type MediaResult struct {
 }
 
 // [元パス]:[URL]の形で記録する
-var uploadedMediaFiles = map[string]string{}
+var uploadedMediaFilePathToURL = map[string]string{}
 
 func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 	fmt.Println("Uploading media files...")
 
 	client := &http.Client{}
 
-	var uploadedMediaFilesCount = 0
+	var uploadedMediaFilePathToURLCount = 0
 	var allMediaFilesCount = len(requests)
 
 	var wg sync.WaitGroup
 
 	go func() {
 		wg.Add(1)
-		tools.DisplayProgressBar(&uploadedMediaFilesCount, &allMediaFilesCount)
+		tools.DisplayProgressBar(&uploadedMediaFilePathToURLCount, &allMediaFilesCount)
 		wg.Done()
 	}()
 
@@ -140,9 +105,9 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 				return
 			}
 
-			mutex.Lock()              // ロックして排他制御
-			uploadedMediaFilesCount++ // カウントアップ
-			uploadedMediaFiles[filePath] = result.Url
+			mutex.Lock()                      // ロックして排他制御
+			uploadedMediaFilePathToURLCount++ // カウントアップ
+			uploadedMediaFilePathToURL[filePath] = result.Url
 			mutex.Unlock() // ロック解除
 		}(filePath, req)
 	}
@@ -152,7 +117,7 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 
 func filePathToUploadMediaRequest(basePath, filePath, priKey, pubKey string) (*http.Request, error) {
 	// ファイルを開く
-	file, err := os.Open(filepath.Join(basePath, filePath))
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read %s: %w", filePath, err)
 	}
@@ -221,39 +186,7 @@ func filePathToUploadMediaRequest(basePath, filePath, priKey, pubKey string) (*h
 
 // basePath以下のMedia Fileのパスを全て羅列する
 func listAllValidStaticMediaFilePaths(basePath string) ([]string, error) {
-	mediaFilePaths := []string{}
-
-	err := filepath.Walk(basePath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// ディレクトリはスキップ
-		if !info.IsDir() {
-			// 各サフィックスに対してマッチングを試みる
-			for _, suffix := range availableContentSuffixes {
-				// ファイル名とサフィックスがマッチした場合
-				if strings.HasSuffix(strings.ToLower(info.Name()), strings.ToLower(suffix)) {
-					// フルパスからbasePathまでの相対パスを計算
-					relPath, err := filepath.Rel(basePath, path)
-					if err != nil {
-						fmt.Println("❌ Error calculating relative path:", err)
-						continue
-					}
-					// マッチするファイルの相対パスをスライスに追加
-					mediaFilePaths = append(mediaFilePaths, "/"+relPath)
-					break
-				}
-			}
-		}
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return mediaFilePaths, nil
+	return tools.FindFilesWithBasePathBySuffixes(basePath, availableContentSuffixes)
 }
 
 // basePath以下のMedia Fileのパスを全て羅列しアップロード
