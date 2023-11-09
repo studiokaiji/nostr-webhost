@@ -107,6 +107,8 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 		wg.Add(1)
 		filePath := filePaths[i]
 
+		fmt.Printf("\nAdded upload request %s", filePath)
+
 		go func(filePath string, req *http.Request) {
 			defer wg.Done()
 
@@ -141,7 +143,6 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 			mutex.Lock()              // ロックして排他制御
 			uploadedMediaFilesCount++ // カウントアップ
 			uploadedMediaFiles[filePath] = result.Url
-			fmt.Printf("Uploaded %s", filePath)
 			mutex.Unlock() // ロック解除
 		}(filePath, req)
 	}
