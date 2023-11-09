@@ -63,7 +63,7 @@ func main() {
 						}
 
 						defaultModeUrl := "https://h.hostr.cc"
-						secureModeUrl := fmt.Sprintf("https://%s.h.hostr.cc", npub)
+						secureModeUrl := fmt.Sprintf("https://%s.hostr.cc", npub)
 
 						if replaceable {
 							defaultModeUrl = fmt.Sprintf("%s/p/%s/d/%s", defaultModeUrl, npub, dTag)
