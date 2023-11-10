@@ -146,7 +146,18 @@ max_ws_frame_bytes = 1024000
 #]
 
 # Event kind allowlist. Events other than these kinds will be discarded.
-event_kind_allowlist = [1964, 1965, 5392, 5393, 5394, 35392, 35393, 35394]
+event_kind_allowlist = [
+  1964,
+  1965,
+  5392,
+  5393,
+  5394,
+  30064,
+  30065,
+  35392,
+  35393,
+  35394,
+]
 
 [authorization]
 # Pubkey addresses in this array are whitelisted for event publishing.
