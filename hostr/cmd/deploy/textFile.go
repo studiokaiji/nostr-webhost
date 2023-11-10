@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/studiokaiji/nostr-webhost/hostr/cmd/tools"
@@ -59,7 +60,11 @@ func generateEventsAndAddQueueAllValidStaticTextFiles(priKey, pubKey, indexHtmlI
 		tags := nostr.Tags{}
 		// 置き換え可能なイベントの場合
 		if replaceable {
-			fileIdentifier := getReplaceableIdentifier(indexHtmlIdentifier, filePath)
+			// filePathからbasePathを取り除く
+			pathForIdentifier := strings.Replace(filePath, basePath, "", 1)
+			// 識別子を取得
+			fileIdentifier := getReplaceableIdentifier(indexHtmlIdentifier, pathForIdentifier)
+
 			tags = tags.AppendUnique(nostr.Tag{"d", fileIdentifier})
 		}
 
