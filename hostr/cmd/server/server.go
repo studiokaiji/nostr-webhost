@@ -64,8 +64,13 @@ func Start(port string, mode string) {
 		}
 
 		filter := nostr.Filter{
-			Kinds: []int{consts.KindWebhostHTML, consts.KindWebhostCSS, consts.KindWebhostJS, consts.KindWebhostPicture},
-			IDs:   ids,
+			Kinds: []int{
+				consts.KindWebhostHTML,
+				consts.KindWebhostCSS,
+				consts.KindWebhostJS,
+				consts.KindTextFile,
+			},
+			IDs: ids,
 		}
 		if mode == "secure" {
 			filter.Authors = []string{subdomainPubKey}
@@ -74,11 +79,16 @@ func Start(port string, mode string) {
 		// Poolからデータを取得する
 		ev := pool.QuerySingle(ctx, allRelays, filter)
 		if ev != nil {
-			contentType, err := tools.GetContentType(ev.Kind)
+			contentType, isTextFile, err := tools.GetContentType(ev)
 			if err != nil {
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+			}
+
+			content, err := tools.GetResponseContent(ev.Content, isTextFile)
+			if err != nil {
+				ctx.String(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 			} else {
-				ctx.Data(http.StatusOK, contentType, []byte(ev.Content))
+				ctx.Data(http.StatusOK, contentType, content)
 			}
 		} else {
 			ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
@@ -112,16 +122,24 @@ func Start(port string, mode string) {
 					consts.KindWebhostReplaceableHTML,
 					consts.KindWebhostReplaceableCSS,
 					consts.KindWebhostReplaceableJS,
+					consts.KindReplaceableTextFile,
 				},
 				Authors: authors,
 				Tags:    tags,
 			})
 			if ev != nil {
-				contentType, err := tools.GetContentType(ev.Kind)
+				contentType, isTextFile, err := tools.GetContentType(ev)
 				if err != nil {
 					ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 				}
-				ctx.Data(http.StatusOK, contentType, []byte(ev.Content))
+
+				// contentの変換
+				content, err := tools.GetResponseContent(ev.Content, isTextFile)
+				if err != nil {
+					ctx.String(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+				} else {
+					ctx.Data(http.StatusOK, contentType, content)
+				}
 			} else {
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 			}
@@ -158,16 +176,24 @@ func Start(port string, mode string) {
 					consts.KindWebhostReplaceableHTML,
 					consts.KindWebhostReplaceableCSS,
 					consts.KindWebhostReplaceableJS,
+					consts.KindReplaceableTextFile,
 				},
 				Authors: authors,
 				Tags:    tags,
 			})
+
 			if ev != nil {
-				contentType, err := tools.GetContentType(ev.Kind)
+				contentType, isTextFile, err := tools.GetContentType(ev)
 				if err != nil {
 					ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 				}
-				ctx.Data(http.StatusOK, contentType, []byte(ev.Content))
+
+				content, err := tools.GetResponseContent(ev.Content, isTextFile)
+				if err != nil {
+					ctx.String(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+				} else {
+					ctx.Data(http.StatusOK, contentType, content)
+				}
 			} else {
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 			}
