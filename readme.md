@@ -44,7 +44,7 @@ Or if you want to generate private key: `hostr generate-key`
    - The event id of index.html will be output after deploy. Please make a copy of it.
 5. Start test web server
 `hostr start`
-6. Access the `http://localhost:3000/e/{event-id-of-index.html}`
+6. Access the `http://localhost:3000/d/{pubkey_or_npub}e/{event-id-of-index.html}`
 
 For detailed information on how to use each command, you can use the `help` command followed by the specific command name.
 
