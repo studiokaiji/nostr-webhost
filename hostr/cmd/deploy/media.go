@@ -49,7 +49,7 @@ type MediaResult struct {
 // [元パス]:[URL]の形で記録する
 var uploadedMediaFilePathToURL = map[string]string{}
 
-func uploadMediaFiles(filePaths []string, requests []*http.Request) {
+func uploadMediaFiles(basePath string, filePaths []string, requests []*http.Request) {
 	fmt.Println("Uploading media files...")
 
 	client := &http.Client{}
@@ -72,7 +72,7 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 		wg.Add(1)
 		filePath := filePaths[i]
 
-		fmt.Printf("\nAdded upload request %s", filePath)
+		fmt.Println("Added upload request", filePath)
 
 		go func(filePath string, req *http.Request) {
 			defer wg.Done()
@@ -107,7 +107,7 @@ func uploadMediaFiles(filePaths []string, requests []*http.Request) {
 
 			mutex.Lock()                      // ロックして排他制御
 			uploadedMediaFilePathToURLCount++ // カウントアップ
-			uploadedMediaFilePathToURL[filePath] = result.Url
+			uploadedMediaFilePathToURL[strings.Replace(filePath, basePath, "", 1)] = result.Url
 			mutex.Unlock() // ロック解除
 		}(filePath, req)
 	}
@@ -206,7 +206,7 @@ func uploadAllValidStaticMediaFiles(priKey, pubKey, basePath string) error {
 		requests = append(requests, request)
 	}
 
-	uploadMediaFiles(filesPaths, requests)
+	uploadMediaFiles(basePath, filesPaths, requests)
 
 	return nil
 }
