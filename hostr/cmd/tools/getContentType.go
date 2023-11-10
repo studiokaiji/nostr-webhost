@@ -15,9 +15,6 @@ func GetContentType(event *nostr.Event) (string, bool, error) {
 		contentTypeTag := event.Tags.GetFirst([]string{"type"})
 		contentType := contentTypeTag.Value()
 
-		fmt.Println(*event)
-		fmt.Println(*contentTypeTag)
-
 		if len(contentType) < 1 {
 			return "", true, fmt.Errorf("Content-Type not specified")
 		}
