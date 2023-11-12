@@ -166,13 +166,25 @@ func convertLinks(
 						n.Attr[i].Val = fileIdentifier
 					}
 
-					// jsファイルを解析する
-					if strings.HasSuffix(a.Val, ".js") {
-						// アップロード済みファイルの元パスとURLを取得
-						for path, url := range uploadedMediaFilePathToURL {
-							// JS内に該当ファイルがあったら置換
-							content = strings.ReplaceAll(content, path, url)
+					// アップロード済みファイルの元パスとURLを取得
+					for path, url := range uploadedMediaFilePathToURL {
+						// 該当ファイルがあったら置換
+						content = strings.ReplaceAll(content, path, url)
+					}
+
+					// 変換済みのテキストファイルの元パスとイベントを取得
+					for path, event := range textFilePathToEvent {
+						// 該当ファイルがあったら、replaceableの場合はdタグ、そうでない場合はneventに置換
+						new := ""
+						if replaceable {
+							new = event.Tags.GetFirst([]string{"d"}).Value()
+						} else {
+							new, err = nip19.EncodeEvent(event.ID, allRelays, pubKey)
+							if err != nil {
+								fmt.Println("❌ Failed encode event id", filePath, ":", err)
+							}
 						}
+						content = strings.ReplaceAll(content, path, new)
 					}
 
 					event, err := getEvent(priKey, pubKey, content, kind, tags)
