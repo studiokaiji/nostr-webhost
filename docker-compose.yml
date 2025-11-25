@@ -9,3 +9,30 @@ services:
       - ./nostr-rs-relay/config.toml:/usr/src/app/config.toml
     user: root
     container_name: nostr-webhost-relay
+    networks:
+      - nostr-network
+  web_server:
+    build:
+      context: ./hostr
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    container_name: nostr-webhost-server
+    environment:
+      - RELAY_URLS=ws://relay:8080
+    depends_on:
+      - relay
+    volumes:
+      - ./hostr/data:/app/data
+      - hostr_config:/app/.config
+    restart: unless-stopped
+    networks:
+      - nostr-network
+    command: ["./hostr", "start", "--port", "3000", "--mode", "normal"]
+
+networks:
+  nostr-network:
+    driver: bridge
+
+volumes:
+  hostr_config:
