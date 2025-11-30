@@ -1,7 +1,5 @@
 # Build stage
-# Go 1.23 is the latest stable version available in Docker Hub
-# The project requires Go 1.25 but we'll use 1.23 for now
-FROM golang:1.23-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # Accept GOTOOLCHAIN as build argument
 ARG GOTOOLCHAIN=auto
