@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -24,6 +25,8 @@ func Start(port string, mode string) {
 	pool := nostr.NewSimplePool(ctx)
 
 	r := gin.Default()
+
+	fmt.Println("[Hostr] Using relays:", strings.Join(allRelays, ", "))
 
 	r.GET("/e/:hex_or_nevent", func(ctx *gin.Context) {
 		hexOrNevent := ctx.Param("hex_or_nevent")
@@ -93,8 +96,6 @@ func Start(port string, mode string) {
 		} else {
 			ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 		}
-
-		return
 	})
 
 	if mode != "secure" {
@@ -197,8 +198,6 @@ func Start(port string, mode string) {
 			} else {
 				ctx.String(http.StatusNotFound, http.StatusText(http.StatusNotFound))
 			}
-
-			return
 		})
 	}
 

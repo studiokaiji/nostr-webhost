@@ -56,6 +56,24 @@ func RemoveRelay(targetURL string) error {
 }
 
 func GetAllRelays() ([]string, error) {
+	// Check if relays are provided via environment variable
+	envRelays := os.Getenv("RELAY_URLS")
+	if envRelays != "" {
+		// Parse comma-separated relay URLs from environment variable
+		relayList := strings.Split(envRelays, ",")
+		cleanedRelays := []string{}
+		for _, relay := range relayList {
+			trimmed := strings.TrimSpace(relay)
+			if len(trimmed) > 0 {
+				cleanedRelays = append(cleanedRelays, trimmed)
+			}
+		}
+		if len(cleanedRelays) > 0 {
+			return cleanedRelays, nil
+		}
+	}
+
+	// Fall back to reading from file if environment variable is not set
 	dir, err := paths.GetSettingsDirectory()
 	if err != nil {
 		return nil, err
@@ -75,5 +93,6 @@ func GetAllRelays() ([]string, error) {
 			lines = append(lines, line)
 		}
 	}
+
 	return lines, nil
 }

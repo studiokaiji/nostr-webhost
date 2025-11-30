@@ -23,6 +23,12 @@ func main() {
 			{
 				Name:  "deploy",
 				Usage: "🌐 Deploy nostr website",
+				Description: `Deploy your website to Nostr relays.
+
+Relay configuration:
+  - Set RELAY_URLS environment variable with comma-separated relay URLs to bypass .nostr_relays file
+  - Example: RELAY_URLS="wss://relay1.com,wss://relay2.com" hostr deploy
+  - If RELAY_URLS is not set, will read from .nostr_relays file`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:    "path",
@@ -160,6 +166,12 @@ func main() {
 			{
 				Name:  "start",
 				Usage: "🕺 Wake up web server",
+				Description: `Start the web server to serve content from Nostr relays.
+
+Relay configuration:
+  - Set RELAY_URLS environment variable with comma-separated relay URLs to bypass .nostr_relays file
+  - Example: RELAY_URLS="wss://relay1.com,wss://relay2.com" hostr start
+  - If RELAY_URLS is not set, will read from .nostr_relays file`,
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:    "port",
