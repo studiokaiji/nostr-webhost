@@ -39,9 +39,6 @@ WORKDIR /app
 # Copy the binary from builder
 COPY --from=builder /app/hostr .
 
-# Copy entrypoint script
-COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-
 # Create directories for data and config
 RUN mkdir -p /app/data /home/hostr/.nostr-webhost && \
     chmod +x /app/docker-entrypoint.sh && \
