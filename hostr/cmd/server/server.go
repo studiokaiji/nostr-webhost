@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nbd-wtf/go-nostr"
@@ -27,6 +28,56 @@ func Start(port string, mode string) {
 	r := gin.Default()
 
 	fmt.Println("[Hostr] Using relays:", strings.Join(allRelays, ", "))
+
+	// Health check endpoint
+	r.GET("/health", func(ctx *gin.Context) {
+		// Test connection to relays by creating a simple filter
+		testCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		// Try to connect to at least one relay
+		activeRelays := []string{}
+		for _, relay := range allRelays {
+			_, err := pool.EnsureRelay(relay)
+			if err == nil {
+				activeRelays = append(activeRelays, relay)
+			}
+		}
+
+		healthStatus := gin.H{
+			"status": "healthy",
+			"mode":   mode,
+			"relays": gin.H{
+				"configured": allRelays,
+				"active":     activeRelays,
+				"count":      len(activeRelays),
+			},
+		}
+
+		// If no relays are active, return unhealthy status
+		if len(activeRelays) == 0 {
+			healthStatus["status"] = "unhealthy"
+			healthStatus["error"] = "No active relay connections"
+			ctx.JSON(http.StatusServiceUnavailable, healthStatus)
+			return
+		}
+
+		// Try a simple query to verify relay connectivity
+		testFilter := nostr.Filter{
+			Kinds: []int{consts.KindWebhostHTML},
+			Limit: 1,
+		}
+
+		testEv := pool.QuerySingle(testCtx, activeRelays[:1], testFilter)
+		if testEv != nil || testCtx.Err() == context.DeadlineExceeded {
+			// Either found an event or timeout (both indicate relay is responding)
+			healthStatus["relay_check"] = "responsive"
+		} else {
+			healthStatus["relay_check"] = "no_response"
+		}
+
+		ctx.JSON(http.StatusOK, healthStatus)
+	})
 
 	r.GET("/e/:hex_or_nevent", func(ctx *gin.Context) {
 		hexOrNevent := ctx.Param("hex_or_nevent")

@@ -41,7 +41,6 @@ COPY --from=builder /app/hostr .
 
 # Create directories for data and config
 RUN mkdir -p /app/data /home/hostr/.nostr-webhost && \
-    chmod +x /app/docker-entrypoint.sh && \
     chown -R hostr:hostr /app /home/hostr
 
 # Switch to non-root user
